@@ -3,12 +3,13 @@ package config
 import (
 	"errors"
 	"os"
+	"strconv"
 )
 
 type Config struct {
 	TgBotToken     string
 	LoggerBotToken string
-	AdminUsername  string
+	AdminID        uint32
 	ActivationKey  string
 	IsDebug        bool
 }
@@ -23,7 +24,11 @@ func GetConfig() (Config, error) {
 
 	config.LoggerBotToken = os.Getenv("LOGGER_BOT_TOKEN")
 
-	config.AdminUsername = os.Getenv("ADMIN_USERNAME")
+	adminId, err := strconv.Atoi(os.Getenv("ADMIN_ID"))
+	if err != nil {
+		return config, errors.New("environment variable ADMIN_ID is not set")
+	}
+	config.AdminID = uint32(adminId)
 
 	config.ActivationKey = os.Getenv("ACTIVATION_KEY")
 	if config.ActivationKey == "" {

@@ -1,10 +1,11 @@
 package main
 
 import (
-	"log"
 	c "memetgbot/src/core/config"
+	l "memetgbot/src/core/logger"
 
 	g "github.com/joho/godotenv"
+	//t "gopkg.in/telebot.v4"
 )
 
 func main() {
@@ -18,5 +19,8 @@ func main() {
 		panic("Error getting config: " + err.Error())
 	}
 
-	log.Println(config)
+	logger := l.GetLoggerService(config.IsDebug, l.NewLoggerBot(config.LoggerBotToken, config.AdminID), config.AdminID)
+
+	logger.Error("Hi!")
+
 }
