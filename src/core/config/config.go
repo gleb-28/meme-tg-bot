@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"strconv"
 )
@@ -12,6 +13,15 @@ type Config struct {
 	AdminID        uint32
 	ActivationKey  string
 	IsDebug        bool
+	Database       DatabaseConfig
+}
+
+type DatabaseConfig struct {
+	Host     string
+	Port     string
+	User     string
+	Password string
+	Name     string
 }
 
 func GetConfig() (Config, error) {
@@ -37,5 +47,33 @@ func GetConfig() (Config, error) {
 
 	config.IsDebug = os.Getenv("IS_DEBUG") == "true"
 
+	config.Database = DatabaseConfig{
+		Host:     os.Getenv("DB_HOST"),
+		Port:     os.Getenv("DB_PORT"),
+		User:     os.Getenv("DB_USER"),
+		Password: os.Getenv("DB_PASSWORD"),
+		Name:     os.Getenv("DB_NAME"),
+	}
+	if config.Database.Host == "" {
+		return config, errors.New("environment variable DB_HOST is not set")
+	}
+	if config.Database.Port == "" {
+		return config, errors.New("environment variable DB_PORT is not set")
+	}
+	if config.Database.User == "" {
+		return config, errors.New("environment variable DB_USER is not set")
+	}
+	if config.Database.Password == "" {
+		return config, errors.New("environment variable DB_PASSWORD is not set")
+	}
+	if config.Database.Name == "" {
+		return config, errors.New("environment variable DB_NAME is not set")
+	}
+
 	return config, nil
+}
+
+func (dc *DatabaseConfig) ToDSN() string {
+	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+		dc.Host, dc.User, dc.Password, dc.Name, dc.Port)
 }
