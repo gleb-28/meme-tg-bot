@@ -2,23 +2,25 @@ package db
 
 import (
 	"log"
+	c "memetgbot/internal/core/config"
+	l "memetgbot/internal/core/logger"
 	"memetgbot/models"
-	"memetgbot/src/core/config"
-	l "memetgbot/src/core/logger"
 	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func InitDB(config *config.DatabaseConfig, logger l.Logger) *gorm.DB {
+func InitDB() *gorm.DB {
+	var config = c.Config
+	var logger = l.Logger
 	var db *gorm.DB
 	var err error
 	maxRetries := 5
 	retryInterval := 5 * time.Second
 
 	for i := 0; i < maxRetries; i++ {
-		db, err = gorm.Open(postgres.Open(config.ToDSN()), &gorm.Config{})
+		db, err = gorm.Open(postgres.Open(config.Database.ToDSN()), &gorm.Config{})
 		if err == nil {
 			logger.Info("Successfully connected to the database!")
 			break

@@ -2,6 +2,7 @@ package logger
 
 import (
 	"log"
+	c "memetgbot/internal/core/config"
 	"time"
 
 	t "gopkg.in/telebot.v4"
@@ -37,11 +38,11 @@ func (loggerService *LoggerService) Error(message string) {
 	}
 }
 
-func GetLoggerService(isDebug bool, loggerBot *t.Bot, adminID uint32) *LoggerService {
+func getLoggerService(isDebug bool, loggerBot *t.Bot, adminID uint32) *LoggerService {
 	return &LoggerService{isDebug: isDebug, loggerBot: loggerBot, adminID: adminID}
 }
 
-func NewLoggerBot(token string, adminID uint32) *t.Bot {
+func newLoggerBot(token string, adminID uint32) *t.Bot {
 	if token == "" || adminID == 0 {
 		return nil
 	}
@@ -58,3 +59,6 @@ func NewLoggerBot(token string, adminID uint32) *t.Bot {
 
 	return bot
 }
+
+var config = c.Config
+var Logger = getLoggerService(config.IsDebug, newLoggerBot(config.LoggerBotToken, config.AdminID), config.AdminID)
