@@ -16,9 +16,11 @@ func messageHandler(ctx telebot.Context) error {
 
 	switch fsm.Current() {
 	case fsmManager.StateInitial:
-		return nil
+		return handleMessage(ctx)
 	case fsmManager.StateAwaitingKey:
 		return validateActivationKey(ctx)
+	case fsmManager.StateProcessingLink:
+		return handleProcessingLink(ctx)
 	default:
 		return nil
 	}

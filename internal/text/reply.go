@@ -1,12 +1,13 @@
 package text
 
 type Reply struct {
-	Start             string
-	EnterKey          string
-	EnterKeySuccess   string
-	KeyAlreadyEntered string
-	EnterKeyWrong     string
-	Error             string
+	Start              string
+	EnterKey           string
+	EnterKeySuccess    string
+	KeyAlreadyEntered  string
+	EnterKeyWrong      string
+	IsNotValidURLError string
+	Error              string
 }
 
 func getReplies() *Reply {
@@ -16,6 +17,7 @@ func getReplies() *Reply {
 		"Супер! Теперь можешь пользоваться!",
 		"Ты уже активировал секретный ключ",
 		"Неверный ключ",
+		"По такой ссылке не могу скачать(",
 		"Произошла ошибка :(",
 	}
 }
