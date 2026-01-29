@@ -11,16 +11,17 @@ import (
 	"gorm.io/gorm"
 )
 
-func InitDB() *gorm.DB {
+var DB *gorm.DB
+
+func InitDB() {
 	var config = c.Config
 	var logger = l.Logger
-	var db *gorm.DB
 	var err error
 	maxRetries := 5
 	retryInterval := 5 * time.Second
 
 	for i := 0; i < maxRetries; i++ {
-		db, err = gorm.Open(postgres.Open(config.Database.ToDSN()), &gorm.Config{})
+		DB, err = gorm.Open(postgres.Open(config.Database.ToDSN()), &gorm.Config{})
 		if err == nil {
 			logger.Info("Successfully connected to the database!")
 			break
@@ -34,10 +35,8 @@ func InitDB() *gorm.DB {
 		log.Fatalf("Failed to connect to database after %d attempts: %v", maxRetries, err)
 	}
 
-	err = db.AutoMigrate(&models.Chat{})
+	err = DB.AutoMigrate(&models.Chat{})
 	if err != nil {
 		panic("Failed to AutoMigrate: " + err.Error())
 	}
-
-	return db
 }
