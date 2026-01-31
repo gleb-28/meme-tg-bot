@@ -2,9 +2,9 @@ package message
 
 import (
 	"context"
+	b "memetgbot/internal"
 	"memetgbot/internal/core/logger"
 	fsmManager "memetgbot/internal/fsm"
-	"memetgbot/internal/repo"
 	"memetgbot/internal/text"
 	"memetgbot/pkg/video"
 	"strings"
@@ -15,36 +15,24 @@ import (
 func handleLink(ctx telebot.Context) error {
 	chatId := ctx.Chat().ID
 
-	chat, err := repo.Chat.Get(chatId)
-	if err != nil {
-		logger.Logger.Error(err.Error())
-		return ctx.Send(text.Replies.Error)
-	}
-	if chat.TelegramID == 0 {
-		return nil
-	}
+	fsmManager.FSM.UserEvent(context.Background(), chatId, fsmManager.ProcessingLinkEvent)
 
-	fsm := fsmManager.FSM.GetFSMForUser(chatId)
-	err = fsm.Event(context.Background(), fsmManager.ProcessingLinkEvent)
-
-	path, name, err := video.VideoService.DownloadVideo(ctx.Message().Text)
+	path, name, err := video.VideoService.DownloadVideo(context.Background(), ctx.Message().Text)
 	if err != nil {
-		if strings.Contains(err.Error(), "is not a valid URL") {
+		if strings.Contains(err.Error(), "URL") {
 			logger.Logger.Error(err.Error())
-			ctx.Send(text.Replies.IsNotValidURLError)
-			return setInitialState(ctx, chatId)
+			b.SendWithHandlingErr(chatId, text.Replies.IsNotValidURLError)
+			fsmManager.FSM.UserEvent(context.Background(), chatId, fsmManager.InitialEvent)
+			return nil
 		}
 		logger.Logger.Error(err.Error())
-		ctx.Send(text.Replies.Error)
-		return setInitialState(ctx, chatId)
+		b.SendWithHandlingErr(chatId, text.Replies.Error)
+		fsmManager.FSM.UserEvent(context.Background(), chatId, fsmManager.InitialEvent)
+		return nil
 	}
 	a := &telebot.Video{File: telebot.FromDisk(path), FileName: name, CaptionAbove: true, Caption: name}
-	err = ctx.Send(a)
-	if err != nil {
-		logger.Logger.Error(err.Error())
-		ctx.Send(text.Replies.Error)
-		return setInitialState(ctx, chatId)
-	}
+	b.SendWithHandlingErr(chatId, a)
 
-	return setInitialState(ctx, chatId)
+	fsmManager.FSM.UserEvent(context.Background(), chatId, fsmManager.InitialEvent)
+	return nil
 }

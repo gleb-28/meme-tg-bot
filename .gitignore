@@ -28,6 +28,7 @@ go.sum
 .build/
 .cache/
 .vscode/
+output
 
 # Environment variables
 .env

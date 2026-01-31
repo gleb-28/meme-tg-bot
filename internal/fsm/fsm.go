@@ -67,4 +67,12 @@ func (fsm *FSMState) afterEvent(userID int64, e *f.Event) {
 	logger.Logger.Debug(fmt.Sprintf("User %d - After event '%s': New state '%s'\n", userID, e.Event, e.Dst))
 }
 
+func (fsm *FSMState) UserEvent(ctx context.Context, chatId int64, event string, args ...interface{}) {
+	userFSM := fsm.GetFSMForUser(chatId)
+	err := userFSM.Event(ctx, event, args...)
+	if err != nil {
+		logger.Logger.Error(err.Error())
+	}
+}
+
 var FSM = initFSM()

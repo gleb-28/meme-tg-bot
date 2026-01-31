@@ -18,13 +18,7 @@ func Key(ctx telebot.Context) error {
 		return ctx.Send(text.Replies.Error)
 	}
 	if chat.TelegramID == 0 {
-		fsm := fsmManager.FSM.GetFSMForUser(chatId)
-		err = fsm.Event(context.Background(), fsmManager.AwaitingKeyEvent)
-		if err != nil {
-			logger.Logger.Error(err.Error())
-			return ctx.Send(text.Replies.Error)
-		}
-
+		fsmManager.FSM.UserEvent(context.Background(), chatId, fsmManager.AwaitingKeyEvent)
 		return ctx.Send(text.Replies.EnterKey)
 	}
 

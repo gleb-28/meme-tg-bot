@@ -1,6 +1,10 @@
 package commands
 
-import "gopkg.in/telebot.v4"
+import (
+	"memetgbot/internal/handlers/auth"
+
+	"gopkg.in/telebot.v4"
+)
 
 var commands = []telebot.Command{
 	{Text: "start", Description: "Старт"},
@@ -13,6 +17,6 @@ func InitCommands(bot *telebot.Bot) {
 		panic("Failed to set commands: " + err.Error())
 	}
 
-	bot.Handle("/start", Start)
+	bot.Handle("/start", Start, auth.WithAuth)
 	bot.Handle("/key", Key)
 }

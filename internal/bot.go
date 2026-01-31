@@ -1,18 +1,18 @@
 package bot
 
 import (
+	"fmt"
 	c "memetgbot/internal/core/config"
 	l "memetgbot/internal/core/logger"
-	"memetgbot/internal/handlers/commands"
-	"memetgbot/internal/handlers/message"
 	"time"
 
 	"gopkg.in/telebot.v4"
 )
 
-func InitBot() {
+var logger = l.Logger
+
+func createBot() *telebot.Bot {
 	var config = c.Config
-	var logger = l.Logger
 
 	bot, err := telebot.NewBot(telebot.Settings{
 		Token:     config.TgBotToken,
@@ -26,9 +26,14 @@ func InitBot() {
 		panic("Error creating bot: " + err.Error())
 	}
 
-	commands.InitCommands(bot)
-	message.InitMessagesHandler(bot)
+	return bot
+}
 
-	logger.Info("Bot successfully started!")
-	bot.Start()
+var Bot = createBot()
+
+func SendWithHandlingErr(chatId int64, what interface{}, opts ...interface{}) {
+	_, err := Bot.Send(&telebot.User{ID: chatId}, what, opts...)
+	if err != nil {
+		logger.Error(fmt.Sprintf("Error sending message to %v: %v", chatId, err.Error()))
+	}
 }

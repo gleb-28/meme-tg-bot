@@ -17,7 +17,7 @@ func (chatRepo *ChatRepo) Add(telegramID int64) error {
 
 func (chatRepo *ChatRepo) Get(telegramID int64) (models.Chat, error) {
 	var result models.Chat
-	resp := db.DB.Model(models.Chat{TelegramID: telegramID}).Scan(&result)
+	resp := db.DB.Find(&models.Chat{}, &models.Chat{TelegramID: telegramID}).Scan(&result)
 
 	return result, resp.Error
 }

@@ -34,9 +34,7 @@ func NewVideoService(downloadDir string, ytdlpPath string) *Video {
 	}
 }
 
-func (s *Video) DownloadVideo(videoURL string) (filePath string, fileName string, err error) {
-	ctx := context.Background()
-
+func (s *Video) DownloadVideo(ctx context.Context, videoURL string) (filePath string, fileName string, err error) {
 	dl := ytdlp.New()
 
 	if s.ytdlpPath != "" {
@@ -45,7 +43,9 @@ func (s *Video) DownloadVideo(videoURL string) (filePath string, fileName string
 
 	dl = dl.
 		Output(filepath.Join(s.downloadDir, "%(title)s.%(ext)s")).
-		Format("bestvideo+bestaudio/best").
+		// Download the best video no better than 720p preferring framerate greater than 30, filesize < 50M
+		// or the worst video (still preferring framerate greater than 30, filesize < 50M) if there is no such video,
+		Format("((bv*[fps>30][filesize<50M]/bv*)[height<=720]/(wv*[fps>30][filesize<50M]/wv*)) + ba / (b[fps>30][filesize<50M]/b)[height<=480]/(w[fps>30]/w)").
 		MergeOutputFormat("mp4").
 		NoCheckCertificates()
 

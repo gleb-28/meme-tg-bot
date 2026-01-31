@@ -2,6 +2,7 @@ package message
 
 import (
 	fsmManager "memetgbot/internal/fsm"
+	"memetgbot/internal/handlers/auth"
 
 	"gopkg.in/telebot.v4"
 )
@@ -16,11 +17,11 @@ func messageHandler(ctx telebot.Context) error {
 
 	switch fsm.Current() {
 	case fsmManager.StateInitial:
-		return handleMessage(ctx)
+		return auth.WithAuth(handleMessage)(ctx)
 	case fsmManager.StateAwaitingKey:
 		return validateActivationKey(ctx)
 	case fsmManager.StateProcessingLink:
-		return handleProcessingLink(ctx)
+		return auth.WithAuth(handleProcessingLink)(ctx)
 	default:
 		return nil
 	}
