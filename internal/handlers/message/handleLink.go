@@ -6,6 +6,7 @@ import (
 	"memetgbot/internal/core/logger"
 	fsmManager "memetgbot/internal/fsm"
 	"memetgbot/internal/text"
+	"memetgbot/pkg/utils"
 	"memetgbot/pkg/video"
 	"strings"
 
@@ -30,8 +31,13 @@ func handleLink(ctx telebot.Context) error {
 		fsmManager.FSM.UserEvent(context.Background(), chatId, fsmManager.InitialEvent)
 		return nil
 	}
-	a := &telebot.Video{File: telebot.FromDisk(path), FileName: name, CaptionAbove: true, Caption: name}
+	cleanFileName := utils.RemoveSaltFromFileName(name)
+	a := &telebot.Video{File: telebot.FromDisk(path), FileName: cleanFileName, CaptionAbove: true, Caption: cleanFileName}
 	b.SendWithHandlingErr(chatId, a)
+	err = video.VideoService.DeleteVideoByName(name)
+	if err != nil {
+		logger.Logger.Error("Error deleting file " + name + err.Error())
+	}
 
 	fsmManager.FSM.UserEvent(context.Background(), chatId, fsmManager.InitialEvent)
 	return nil

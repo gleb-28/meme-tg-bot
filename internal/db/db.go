@@ -7,7 +7,7 @@ import (
 	"memetgbot/models"
 	"time"
 
-	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -21,7 +21,7 @@ func InitDB() {
 	retryInterval := 5 * time.Second
 
 	for i := 0; i < maxRetries; i++ {
-		DB, err = gorm.Open(postgres.Open(config.Database.ToDSN()), &gorm.Config{})
+		DB, err = gorm.Open(sqlite.Open(config.Database.FileName), &gorm.Config{})
 		if err == nil {
 			logger.Info("Successfully connected to the database!")
 			break
