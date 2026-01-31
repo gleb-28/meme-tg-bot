@@ -1,14 +1,21 @@
 package repo
 
 import (
-	"memetgbot/internal/db"
 	"memetgbot/models"
+
+	"gorm.io/gorm"
 )
 
-type ChatRepo struct{}
+type ChatRepo struct {
+	db *gorm.DB
+}
+
+func NewChatRepo(db *gorm.DB) *ChatRepo {
+	return &ChatRepo{db: db}
+}
 
 func (chatRepo *ChatRepo) Add(telegramID int64) error {
-	resp := db.DB.Model(&models.Chat{}).Create(&models.Chat{
+	resp := chatRepo.db.Model(&models.Chat{}).Create(&models.Chat{
 		TelegramID: telegramID,
 	})
 
@@ -17,9 +24,7 @@ func (chatRepo *ChatRepo) Add(telegramID int64) error {
 
 func (chatRepo *ChatRepo) Get(telegramID int64) (models.Chat, error) {
 	var result models.Chat
-	resp := db.DB.Find(&models.Chat{}, &models.Chat{TelegramID: telegramID}).Scan(&result)
+	resp := chatRepo.db.Find(&models.Chat{}, &models.Chat{TelegramID: telegramID}).Scan(&result)
 
 	return result, resp.Error
 }
-
-var Chat = ChatRepo{}

@@ -28,14 +28,16 @@ var events = []f.EventDesc{
 }
 
 type FSMState struct {
-	users map[int64]*f.FSM
-	mu    *sync.Mutex
+	users  map[int64]*f.FSM
+	mu     *sync.Mutex
+	logger logger.AppLogger
 }
 
-func initFSM() *FSMState {
+func New(logger logger.AppLogger) *FSMState {
 	return &FSMState{
-		users: make(map[int64]*f.FSM),
-		mu:    &sync.Mutex{},
+		users:  make(map[int64]*f.FSM),
+		mu:     &sync.Mutex{},
+		logger: logger,
 	}
 }
 
@@ -60,19 +62,17 @@ func (fsm *FSMState) GetFSMForUser(userID int64) *f.FSM {
 }
 
 func (fsm *FSMState) beforeEvent(userID int64, e *f.Event) {
-	logger.Logger.Debug(fmt.Sprintf("User %d - Before event '%s': State '%s' -> '%s'\n", userID, e.Event, e.Src, e.Dst))
+	fsm.logger.Debug(fmt.Sprintf("User %d - Before event '%s': State '%s' -> '%s'\n", userID, e.Event, e.Src, e.Dst))
 }
 
 func (fsm *FSMState) afterEvent(userID int64, e *f.Event) {
-	logger.Logger.Debug(fmt.Sprintf("User %d - After event '%s': New state '%s'\n", userID, e.Event, e.Dst))
+	fsm.logger.Debug(fmt.Sprintf("User %d - After event '%s': New state '%s'\n", userID, e.Event, e.Dst))
 }
 
 func (fsm *FSMState) UserEvent(ctx context.Context, chatId int64, event string, args ...interface{}) {
 	userFSM := fsm.GetFSMForUser(chatId)
 	err := userFSM.Event(ctx, event, args...)
 	if err != nil {
-		logger.Logger.Error(err.Error())
+		fsm.logger.Error(err.Error())
 	}
 }
-
-var FSM = initFSM()

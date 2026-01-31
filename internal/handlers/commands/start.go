@@ -1,11 +1,13 @@
 package commands
 
 import (
-	"memetgbot/internal/text"
+	b "memetgbot/internal"
 
 	"gopkg.in/telebot.v4"
 )
 
-func Start(ctx telebot.Context) error {
-	return ctx.Send(text.Replies.Start)
+func createStartHandler(bot *b.Bot) telebot.HandlerFunc {
+	return func(ctx telebot.Context) error {
+		return ctx.Send(bot.Replies.Start)
+	}
 }

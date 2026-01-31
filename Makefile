@@ -3,7 +3,7 @@
 
 build:
 	@echo "Building Go application..."
-	go build -o meme-tg-bot main.go
+	go build -o meme-tg-bot cmd/bot/main.go
 
 tidy:
 	@echo "Tidying Go modules..."
@@ -11,4 +11,4 @@ tidy:
 
 run:
 	@echo "Running Go application locally..."
-	go run main.go
+	go run cmd/bot/main.go

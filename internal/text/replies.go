@@ -1,6 +1,6 @@
 package text
 
-type Reply struct {
+type Replies struct {
 	Start              string
 	EnterKey           string
 	EnterKeySuccess    string
@@ -10,8 +10,8 @@ type Reply struct {
 	Error              string
 }
 
-func getReplies() *Reply {
-	return &Reply{
+func NewReplies() *Replies {
+	return &Replies{
 		"Привет! я мемасный бот 😎. Я умею скачивать видео из популярных соц сетей и отправлять тебе! Отправь мне ссылку, а я тебе видео!",
 		"Введи секретный ключ:",
 		"Супер! Теперь можешь пользоваться!",
@@ -21,5 +21,3 @@ func getReplies() *Reply {
 		"Произошла ошибка :(",
 	}
 }
-
-var Replies = getReplies()

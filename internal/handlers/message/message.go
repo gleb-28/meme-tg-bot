@@ -1,28 +1,31 @@
 package message
 
 import (
+	b "memetgbot/internal"
 	fsmManager "memetgbot/internal/fsm"
 	"memetgbot/internal/handlers/auth"
 
 	"gopkg.in/telebot.v4"
 )
 
-func InitMessagesHandler(bot *telebot.Bot) {
-	bot.Handle(telebot.OnText, messageHandler)
+func MustInitMessagesHandler(bot *b.Bot) {
+	bot.Handle(telebot.OnText, createMessageHandler(bot))
 }
 
-func messageHandler(ctx telebot.Context) error {
-	chatId := ctx.Chat().ID
-	fsm := fsmManager.FSM.GetFSMForUser(chatId)
+func createMessageHandler(bot *b.Bot) telebot.HandlerFunc {
+	return func(ctx telebot.Context) error {
+		chatId := ctx.Chat().ID
+		userFsm := bot.Fsm.GetFSMForUser(chatId)
 
-	switch fsm.Current() {
-	case fsmManager.StateInitial:
-		return auth.WithAuth(handleMessage)(ctx)
-	case fsmManager.StateAwaitingKey:
-		return validateActivationKey(ctx)
-	case fsmManager.StateProcessingLink:
-		return auth.WithAuth(handleProcessingLink)(ctx)
-	default:
-		return nil
+		switch userFsm.Current() {
+		case fsmManager.StateInitial:
+			return auth.CreateAuthMiddleware(bot)(createHandleMessage(bot))(ctx)
+		case fsmManager.StateAwaitingKey:
+			return createValidateActivationKey(bot)(ctx)
+		case fsmManager.StateProcessingLink:
+			return auth.CreateAuthMiddleware(bot)(handleProcessingLink)(ctx)
+		default:
+			return nil
+		}
 	}
 }

@@ -2,18 +2,42 @@ package bot
 
 import (
 	"fmt"
-	c "memetgbot/internal/core/config"
-	l "memetgbot/internal/core/logger"
+	"log"
+	"memetgbot/internal/core/config"
+	"memetgbot/internal/core/logger"
+	fsmManager "memetgbot/internal/fsm"
+	"memetgbot/internal/repo"
+	"memetgbot/internal/text"
+	"memetgbot/pkg/video"
 	"time"
 
 	"gopkg.in/telebot.v4"
 )
 
-var logger = l.Logger
+type Bot struct {
+	*telebot.Bot
+	Fsm          *fsmManager.FSMState
+	ChatRepo     *repo.ChatRepo
+	VideoService *video.VideoService
+	Config       *config.AppConfig
+	Replies      *text.Replies
+	Logger       logger.AppLogger
+}
 
-func createBot() *telebot.Bot {
-	var config = c.Config
+func (bot Bot) MustSend(chatId int64, what interface{}, opts ...interface{}) {
+	_, err := bot.Send(&telebot.User{ID: chatId}, what, opts...)
+	if err != nil {
+		bot.Logger.Error(fmt.Sprintf("Error sending message to %v: %v", chatId, err.Error()))
+	}
+}
 
+func MustBot(
+	config *config.AppConfig,
+	fsm *fsmManager.FSMState,
+	chatRepo *repo.ChatRepo,
+	videoService *video.VideoService,
+	replies *text.Replies,
+	logger logger.AppLogger) *Bot {
 	bot, err := telebot.NewBot(telebot.Settings{
 		Token:     config.TgBotToken,
 		Poller:    &telebot.LongPoller{Timeout: 10 * time.Second},
@@ -23,17 +47,8 @@ func createBot() *telebot.Bot {
 		},
 	})
 	if err != nil {
-		panic("Error creating bot: " + err.Error())
+		log.Fatal("Error creating bot:", err.Error())
 	}
 
-	return bot
-}
-
-var Bot = createBot()
-
-func SendWithHandlingErr(chatId int64, what interface{}, opts ...interface{}) {
-	_, err := Bot.Send(&telebot.User{ID: chatId}, what, opts...)
-	if err != nil {
-		logger.Error(fmt.Sprintf("Error sending message to %v: %v", chatId, err.Error()))
-	}
+	return &Bot{bot, fsm, chatRepo, videoService, config, replies, logger}
 }

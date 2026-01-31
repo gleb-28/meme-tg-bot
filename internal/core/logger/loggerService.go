@@ -2,63 +2,61 @@ package logger
 
 import (
 	"log"
-	c "memetgbot/internal/core/config"
 	"time"
 
-	t "gopkg.in/telebot.v4"
+	"gopkg.in/telebot.v4"
 )
 
-type LoggerService struct {
-	isDebug   bool
-	loggerBot *t.Bot
-	adminID   uint32
+type Logger struct {
+	isDebug      bool
+	loggerBot    *telebot.Bot
+	adminID      int64
+	hasLoggerBot bool
 }
 
-func (loggerService *LoggerService) Debug(message string) {
-	if !loggerService.isDebug {
+func (logger *Logger) Debug(message string) {
+	if !logger.isDebug {
 		return
 	}
 	log.Println("[DEBUG]: " + message)
 }
 
-func (loggerService *LoggerService) Info(message string) {
+func (logger *Logger) Info(message string) {
 	log.Println("[INFO]: " + message)
 }
 
-func (loggerService *LoggerService) Error(message string) {
+func (logger *Logger) Error(message string) {
 	err := "[ERROR]: " + message
 
 	log.Println(err)
 
-	if loggerService.loggerBot != nil {
-		_, err := loggerService.loggerBot.Send(&t.User{ID: 1309740174}, err)
+	if logger.hasLoggerBot {
+		_, err := logger.loggerBot.Send(&telebot.User{ID: logger.adminID}, err)
 		if err != nil {
 			log.Println("[ERROR]: ERROR WHILE SENDING TO LOGGER BOT: " + err.Error())
 		}
 	}
 }
 
-func getLoggerService(isDebug bool, loggerBot *t.Bot, adminID uint32) *LoggerService {
-	return &LoggerService{isDebug: isDebug, loggerBot: loggerBot, adminID: adminID}
+func MustLogger(isDebug bool, loggerBot *telebot.Bot, adminID int64) *Logger {
+	hasLoggerBot := loggerBot != nil || adminID != 0
+	return &Logger{isDebug: isDebug, loggerBot: loggerBot, adminID: adminID, hasLoggerBot: hasLoggerBot}
 }
 
-func newLoggerBot(token string, adminID uint32) *t.Bot {
-	if token == "" || adminID == 0 {
+func MustLoggerBot(token string) *telebot.Bot {
+	if token == "" {
 		return nil
 	}
 
-	loggerBotSettings := t.Settings{
+	loggerBotSettings := telebot.Settings{
 		Token:  token,
-		Poller: &t.LongPoller{Timeout: 10 * time.Second}, // TODO
+		Poller: &telebot.LongPoller{Timeout: 10 * time.Second}, // TODO
 	}
 
-	bot, err := t.NewBot(loggerBotSettings)
+	bot, err := telebot.NewBot(loggerBotSettings)
 	if err != nil {
-		panic("Error creating logger bot: " + err.Error())
+		log.Fatal("Error creating logger bot:", err.Error())
 	}
 
 	return bot
 }
-
-var config = c.Config
-var Logger = getLoggerService(config.IsDebug, newLoggerBot(config.LoggerBotToken, config.AdminID), config.AdminID)
