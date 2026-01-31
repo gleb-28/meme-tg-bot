@@ -7,6 +7,7 @@ import (
 	"memetgbot/pkg/utils"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/lrstanley/go-ytdlp"
 )
@@ -41,8 +42,10 @@ func (s *Video) DownloadVideo(ctx context.Context, videoURL string) (filePath st
 		dl = dl.SetExecutable(s.ytdlpPath)
 	}
 
+	salt := utils.GenerateSalt()
+
 	dl = dl.
-		Output(filepath.Join(s.downloadDir, "%(title)s.%(ext)s")).
+		Output(filepath.Join(s.downloadDir, "%(title)s_"+salt+".%(ext)s")).
 		// Download the best video no better than 720p preferring framerate greater than 30, filesize < 50M
 		// or the worst video (still preferring framerate greater than 30, filesize < 50M) if there is no such video,
 		Format("((bv*[fps>30][filesize<50M]/bv*)[height<=720]/(wv*[fps>30][filesize<50M]/wv*)) + ba / (b[fps>30][filesize<50M]/b)[height<=480]/(w[fps>30]/w)").
@@ -63,14 +66,14 @@ func (s *Video) DownloadVideo(ctx context.Context, videoURL string) (filePath st
 		return "", "", fmt.Errorf("failed to read download directory '%s': %w", s.downloadDir, err)
 	}
 
-	var latestFileInfo os.FileInfo
 	var latestFilePath string
+	var latestFileName string
 
 	for _, entry := range entries {
 		info, err := entry.Info()
-		name := utils.SanitizeFilename(entry.Name())
+		latestFileName = utils.SanitizeFilename(entry.Name())
 		if err != nil {
-			logger.Logger.Error(fmt.Sprintf("Failed to get file info for %s: %v", name, err))
+			logger.Logger.Error(fmt.Sprintf("Failed to get file info for %s: %v", latestFileName, err))
 			continue
 		}
 
@@ -78,9 +81,9 @@ func (s *Video) DownloadVideo(ctx context.Context, videoURL string) (filePath st
 			continue
 		}
 
-		if latestFileInfo == nil || info.ModTime().After(latestFileInfo.ModTime()) {
-			latestFileInfo = info
-			latestFilePath = filepath.Join(s.downloadDir, name)
+		if strings.Contains(latestFileName, salt) {
+			latestFilePath = filepath.Join(s.downloadDir, latestFileName)
+			break
 		}
 	}
 
@@ -89,5 +92,23 @@ func (s *Video) DownloadVideo(ctx context.Context, videoURL string) (filePath st
 	}
 
 	logger.Logger.Debug(fmt.Sprintf("Downloaded file found: %s", latestFilePath))
-	return latestFilePath, utils.SanitizeFilename(latestFileInfo.Name()), nil
+	return latestFilePath, latestFileName, nil
+}
+
+func (s *Video) DeleteVideoByName(videoName string) error {
+	videoPath := filepath.Join(s.downloadDir, utils.SanitizeFilename(videoName))
+
+	if _, err := os.Stat(videoPath); os.IsNotExist(err) {
+		return fmt.Errorf("video %s does not exist in %s", videoName, s.downloadDir)
+	} else if err != nil {
+		return fmt.Errorf("failed to stat video file %s: %w", videoPath, err)
+	}
+
+	// Удаление файла
+	if err := os.Remove(videoPath); err != nil {
+		return fmt.Errorf("failed to delete video %s: %w", videoName, err)
+	}
+
+	logger.Logger.Debug(fmt.Sprintf("Video %s has been deleted successfully", videoName))
+	return nil
 }
