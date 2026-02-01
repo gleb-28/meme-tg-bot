@@ -30,7 +30,7 @@ func createHandleLink(bot *b.Bot) telebot.HandlerFunc {
 			bot.Fsm.UserEvent(context.Background(), chatId, fsmManager.InitialEvent)
 			return nil
 		}
-		cleanFileName := utils.RemoveSaltFromFileName(name)
+		cleanFileName := utils.RemoveSaltFromFileName(utils.RemoveCompressedSuffix(name))
 		a := &telebot.Video{File: telebot.FromDisk(path), FileName: cleanFileName, CaptionAbove: true, Caption: cleanFileName}
 		bot.MustSend(chatId, a)
 		err = bot.VideoService.DeleteVideoByName(name)

@@ -21,13 +21,21 @@ Before running the bot make sure you have installed:
 - Go 1.25
 - yt-dlp
 - SQLite
+- ffmpeg
 
 Check installed versions:
 ```bash
 go version
 yt-dlp --version
 sqlite3 --version
+ffmpeg -version
 ````
+
+fedora example installing ffmpeg:
+```bash
+sudo dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+sudo dnf install ffmpeg ffmpeg-devel
+```
 
 ## ⚙️ Environment variables
 
@@ -40,6 +48,7 @@ ACTIVATION_KEY=            # REQUIRED - password to use the bot
 DB_FILE_NAME=              # REQUIRED - SQLite db file (*.db)
 COOKIES_PATH=cookies.txt   # REQUIRED - path to cookies file
 YTDLP_PATH=/usr/bin/yt-dlp # REQUIRED - yt-dlp binary path
+FFMPEG_PATH=/usr/bin/ffmpeg # REQUIRED - ffmpeg binary path
 IS_DEBUG=false             # OPTIONAL - print logs for debugging
 ```
 ## 📁 Project commands

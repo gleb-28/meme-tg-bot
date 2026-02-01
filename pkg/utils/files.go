@@ -29,18 +29,21 @@ func GenerateSalt() string {
 }
 
 func RemoveSaltFromFileName(fileName string) string {
-	// Извлекаем расширение файла
 	ext := filepath.Ext(fileName)
 
-	// Получаем основное имя файла без расширения
 	baseName := strings.TrimSuffix(fileName, ext)
 
-	// Находим последний символ подчеркивания
 	lastUnderscore := strings.LastIndex(baseName, "_")
 	if lastUnderscore == -1 {
 		return fileName // если подчеркивания нет, возвращаем оригинальное имя
 	}
 
-	// Убираем соль, сохраняя имя файла без неё
 	return baseName[:lastUnderscore] + ext
+}
+
+func RemoveCompressedSuffix(filePath string) string {
+	ext := filepath.Ext(filePath)
+	base := strings.TrimSuffix(filePath, ext)
+	base = strings.TrimSuffix(base, "_compressed")
+	return base + ext
 }

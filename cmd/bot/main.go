@@ -20,7 +20,7 @@ func main() {
 	db := d.MustDB(config, logger)
 	fsm := fsmManager.New(logger)
 	chatRepo := repo.NewChatRepo(db)
-	videoService := video.MustNewVideoService(constants.VideoDownloadDirPath, config.YtdlpPath, config.CookiesPath, logger)
+	videoService := video.MustNewVideoService(constants.VideoDownloadDirPath, config.YtdlpPath, config.CookiesPath, config.FfmpegPath, logger)
 	replies := text.NewReplies()
 	bot := b.MustBot(config, fsm, chatRepo, videoService, replies, logger)
 

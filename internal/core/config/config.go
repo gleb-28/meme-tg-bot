@@ -15,6 +15,7 @@ type AppConfig struct {
 	ActivationKey  string
 	CookiesPath    string
 	YtdlpPath      string
+	FfmpegPath     string
 	IsDebug        bool
 	Database       DatabaseConfig
 }
@@ -57,6 +58,11 @@ func MustConfig() *AppConfig {
 	config.YtdlpPath = os.Getenv("YTDLP_PATH")
 	if config.YtdlpPath == "" {
 		log.Fatal("environment variable YTDLP_PATH is not set")
+	}
+
+	config.FfmpegPath = os.Getenv("FFMPEG_PATH")
+	if config.FfmpegPath == "" {
+		log.Fatal("environment variable FFMPEG_PATH is not set")
 	}
 
 	config.IsDebug = os.Getenv("IS_DEBUG") == "true"
