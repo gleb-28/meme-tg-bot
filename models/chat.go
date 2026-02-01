@@ -6,5 +6,6 @@ import (
 
 type Chat struct {
 	gorm.Model
-	TelegramID int64 `gorm:"unique"`
+	TelegramID int64  `gorm:"uniqueIndex"`
+	Name       string `gorm:"not null"`
 }

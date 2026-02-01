@@ -14,12 +14,11 @@ func NewChatRepo(db *gorm.DB) *ChatRepo {
 	return &ChatRepo{db: db}
 }
 
-func (chatRepo *ChatRepo) Add(telegramID int64) error {
-	resp := chatRepo.db.Model(&models.Chat{}).Create(&models.Chat{
-		TelegramID: telegramID,
-	})
-
-	return resp.Error
+func (chatRepo *ChatRepo) Upsert(chat *models.Chat) error {
+	return chatRepo.db.Where("telegram_id = ?", chat.TelegramID).
+		Assign(chat).
+		FirstOrCreate(chat).
+		Error
 }
 
 func (chatRepo *ChatRepo) Get(telegramID int64) (models.Chat, error) {

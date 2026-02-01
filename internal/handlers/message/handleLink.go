@@ -14,6 +14,7 @@ func createHandleLink(bot *b.Bot) telebot.HandlerFunc {
 	return func(ctx telebot.Context) error {
 		chatId := ctx.Chat().ID
 
+		bot.MustSend(chatId, "⏳") // TODO
 		bot.Fsm.UserEvent(context.Background(), chatId, fsmManager.ProcessingLinkEvent)
 
 		path, name, err := bot.VideoService.DownloadVideo(context.Background(), ctx.Message().Text)
