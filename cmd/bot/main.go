@@ -3,6 +3,7 @@ package main
 import (
 	b "memetgbot/internal"
 	cfg "memetgbot/internal/core/config"
+	"memetgbot/internal/core/constants"
 	l "memetgbot/internal/core/logger"
 	d "memetgbot/internal/db"
 	fsmManager "memetgbot/internal/fsm"
@@ -19,7 +20,7 @@ func main() {
 	db := d.MustDB(config, logger)
 	fsm := fsmManager.New(logger)
 	chatRepo := repo.NewChatRepo(db)
-	videoService := video.MustNewVideoService("./output", "/usr/bin/yt-dlp", logger)
+	videoService := video.MustNewVideoService(constants.VideoDownloadDirPath, config.YtdlpPath, config.CookiesPath, logger)
 	replies := text.NewReplies()
 	bot := b.MustBot(config, fsm, chatRepo, videoService, replies, logger)
 

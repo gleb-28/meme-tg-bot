@@ -16,10 +16,11 @@ import (
 type VideoService struct {
 	downloadDir string
 	ytdlpPath   string
+	cookiesPath string
 	logger      logger.AppLogger
 }
 
-func MustNewVideoService(downloadDir string, ytdlpPath string, logger logger.AppLogger) *VideoService {
+func MustNewVideoService(downloadDir string, ytdlpPath string, cookiesPath string, logger logger.AppLogger) *VideoService {
 	if _, err := os.Stat(downloadDir); os.IsNotExist(err) {
 		err = os.MkdirAll(downloadDir, 0755)
 		if err != nil {
@@ -32,6 +33,7 @@ func MustNewVideoService(downloadDir string, ytdlpPath string, logger logger.App
 	return &VideoService{
 		downloadDir: downloadDir,
 		ytdlpPath:   ytdlpPath,
+		cookiesPath: cookiesPath,
 		logger:      logger,
 	}
 }
@@ -51,7 +53,8 @@ func (videoService *VideoService) DownloadVideo(ctx context.Context, videoURL st
 		// or the worst video (still preferring framerate greater than 30, filesize < 50M) if there is no such video,
 		Format("((bv*[fps>30][filesize<50M]/bv*)[height<=720]/(wv*[fps>30][filesize<50M]/wv*)) + ba / (b[fps>30][filesize<50M]/b)[height<=480]/(w[fps>30]/w)").
 		MergeOutputFormat("mp4").
-		NoCheckCertificates()
+		NoCheckCertificates().
+		Cookies(videoService.cookiesPath)
 
 	videoService.logger.Debug(fmt.Sprintf("Starting video download for: %videoService", videoURL))
 

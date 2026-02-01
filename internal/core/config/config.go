@@ -13,6 +13,8 @@ type AppConfig struct {
 	LoggerBotToken string
 	AdminID        int64
 	ActivationKey  string
+	CookiesPath    string
+	YtdlpPath      string
 	IsDebug        bool
 	Database       DatabaseConfig
 }
@@ -45,6 +47,16 @@ func MustConfig() *AppConfig {
 	config.ActivationKey = os.Getenv("ACTIVATION_KEY")
 	if config.ActivationKey == "" {
 		log.Fatal("environment variable ACTIVATION_KEY is not set")
+	}
+
+	config.CookiesPath = os.Getenv("COOKIES_PATH")
+	if config.CookiesPath == "" {
+		log.Fatal("environment variable COOKIES_PATH is not set")
+	}
+
+	config.YtdlpPath = os.Getenv("YTDLP_PATH")
+	if config.YtdlpPath == "" {
+		log.Fatal("environment variable YTDLP_PATH is not set")
 	}
 
 	config.IsDebug = os.Getenv("IS_DEBUG") == "true"
