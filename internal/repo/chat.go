@@ -21,9 +21,9 @@ func (chatRepo *ChatRepo) Upsert(chat *models.Chat) error {
 		Error
 }
 
-func (chatRepo *ChatRepo) Get(telegramID int64) (models.Chat, error) {
+func (chatRepo *ChatRepo) Get(chatId int64) (models.Chat, error) {
 	var result models.Chat
-	resp := chatRepo.db.Find(&models.Chat{}, &models.Chat{TelegramID: telegramID}).Scan(&result)
+	resp := chatRepo.db.Find(&models.Chat{}, &models.Chat{TelegramID: chatId}).Scan(&result)
 
 	return result, resp.Error
 }

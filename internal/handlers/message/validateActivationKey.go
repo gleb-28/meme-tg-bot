@@ -14,7 +14,7 @@ func createValidateActivationKey(bot *b.Bot) telebot.HandlerFunc {
 		chatId := ctx.Chat().ID
 
 		if ctx.Message().Text == bot.Config.ActivationKey {
-			err := bot.ChatRepo.Upsert(&models.Chat{TelegramID: chatId, Name: ctx.Sender().FirstName})
+			err := bot.SaveChat(&models.Chat{TelegramID: chatId, Name: ctx.Sender().FirstName})
 			if err != nil {
 				bot.MustSend(chatId, bot.Replies.Error)
 				bot.Fsm.UserEvent(context.Background(), chatId, fsmManager.InitialEvent)
