@@ -7,6 +7,7 @@ import (
 	"memetgbot/internal/core/logger"
 	fsmManager "memetgbot/internal/fsm"
 	"memetgbot/internal/repo"
+	"memetgbot/internal/session"
 	"memetgbot/internal/text"
 	"memetgbot/models"
 	"memetgbot/pkg/video"
@@ -19,6 +20,7 @@ import (
 type Bot struct {
 	*telebot.Bot
 	Fsm          *fsmManager.FSMState
+	SessionStore *session.Store
 	chatRepo     *repo.ChatRepo
 	VideoService *video.VideoService
 	Config       *config.AppConfig
@@ -29,11 +31,12 @@ type Bot struct {
 	cacheLock sync.RWMutex
 }
 
-func (bot *Bot) MustSend(chatId int64, what interface{}, opts ...interface{}) {
-	_, err := bot.Send(&telebot.User{ID: chatId}, what, opts...)
+func (bot *Bot) MustSend(chatId int64, what interface{}, opts ...interface{}) *telebot.Message {
+	msg, err := bot.Send(&telebot.User{ID: chatId}, what, opts...)
 	if err != nil {
 		bot.Logger.Error(fmt.Sprintf("Error sending message to %v: %v", chatId, err.Error()))
 	}
+	return msg
 }
 
 func (bot *Bot) GetChatCached(chatId int64) (*models.Chat, error) {
@@ -74,6 +77,7 @@ func (bot *Bot) setChatCache(chatId int64, chat *models.Chat) {
 func MustBot(
 	config *config.AppConfig,
 	fsm *fsmManager.FSMState,
+	sessionStore *session.Store,
 	chatRepo *repo.ChatRepo,
 	videoService *video.VideoService,
 	replies *text.Replies,
@@ -93,6 +97,7 @@ func MustBot(
 	return &Bot{
 		bot,
 		fsm,
+		sessionStore,
 		chatRepo,
 		videoService,
 		config,

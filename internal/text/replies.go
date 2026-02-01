@@ -7,6 +7,7 @@ type Replies struct {
 	KeyAlreadyEntered  string
 	EnterKeyWrong      string
 	IsNotValidURLError string
+	Downloading        string
 	Error              string
 }
 
@@ -18,6 +19,7 @@ func NewReplies() *Replies {
 		"Ты уже активировал секретный ключ",
 		"Неверный ключ",
 		"По такой ссылке не могу скачать(",
+		"⏳",
 		"Произошла ошибка :(",
 	}
 }
