@@ -141,6 +141,13 @@ func (videoService *VideoService) DeleteVideoByName(videoName string) error {
 	return nil
 }
 
+func (videoService *VideoService) MustDeleteVideoByName(videoName string) {
+	err := videoService.DeleteVideoByName(videoName)
+	if err != nil {
+		videoService.logger.Error(fmt.Sprintf("Error deleting file %v:%v", videoName, err.Error()))
+	}
+}
+
 func (videoService *VideoService) CompressVideo(inputPath string) (string, error) {
 	outputPath := strings.TrimSuffix(inputPath, filepath.Ext(inputPath)) + "_compressed.mp4"
 	videoService.logger.Debug(fmt.Sprintf("Compressing video: %s", inputPath))

@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"gopkg.in/telebot.v4"
+	"gopkg.in/telebot.v4/react"
 )
 
 type Bot struct {
@@ -37,6 +38,20 @@ func (bot *Bot) MustSend(chatId int64, what interface{}, opts ...interface{}) *t
 		bot.Logger.Error(fmt.Sprintf("Error sending message to %v: %v", chatId, err.Error()))
 	}
 	return msg
+}
+
+func (bot *Bot) MustDelete(msg *telebot.Message) {
+	err := bot.Delete(msg)
+	if err != nil {
+		bot.Logger.Error(fmt.Sprintf("Error deleting message to %v: %v", msg.Chat.ID, err.Error()))
+	}
+}
+
+func (bot *Bot) MustReact(msg *telebot.Message, reaction telebot.Reaction) {
+	err := bot.React(&telebot.User{ID: msg.Chat.ID}, msg, react.React(reaction))
+	if err != nil {
+		bot.Logger.Error(fmt.Sprintf("Error reacting message to %v: %v", msg.Chat.ID, err.Error()))
+	}
 }
 
 func (bot *Bot) GetChatCached(chatId int64) (*models.Chat, error) {

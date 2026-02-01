@@ -10,21 +10,18 @@ import (
 )
 
 const (
-	StateInitial        = "initial"
-	StateAwaitingKey    = "awaiting_key"
-	StateProcessingLink = "processing_link"
+	StateInitial     = "initial"
+	StateAwaitingKey = "awaiting_key"
 )
 
 const (
-	InitialEvent        = "initial__event"
-	AwaitingKeyEvent    = "awaiting_key__event"
-	ProcessingLinkEvent = "processing_link__event"
+	InitialEvent     = "initial__event"
+	AwaitingKeyEvent = "awaiting_key__event"
 )
 
 var events = []f.EventDesc{
-	{Name: InitialEvent, Src: []string{StateInitial, StateAwaitingKey, StateProcessingLink}, Dst: StateInitial},
+	{Name: InitialEvent, Src: []string{StateInitial, StateAwaitingKey}, Dst: StateInitial},
 	{Name: AwaitingKeyEvent, Src: []string{StateInitial}, Dst: StateAwaitingKey},
-	{Name: ProcessingLinkEvent, Src: []string{StateInitial}, Dst: StateProcessingLink},
 }
 
 type FSMState struct {

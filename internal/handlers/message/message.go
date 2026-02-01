@@ -19,11 +19,12 @@ func createMessageHandler(bot *b.Bot) telebot.HandlerFunc {
 
 		switch userFsm.Current() {
 		case fsmManager.StateInitial:
-			return auth.CreateAuthMiddleware(bot)(createHandleMessage(bot))(ctx)
+			go func(bot *b.Bot, ctx telebot.Context) {
+				_ = auth.CreateAuthMiddleware(bot)(createHandleMessage(bot))(bot.NewContext(ctx.Update()))
+			}(bot, ctx)
+			return nil
 		case fsmManager.StateAwaitingKey:
 			return createValidateActivationKey(bot)(ctx)
-		case fsmManager.StateProcessingLink:
-			return auth.CreateAuthMiddleware(bot)(handleProcessingLink)(ctx)
 		default:
 			return nil
 		}
