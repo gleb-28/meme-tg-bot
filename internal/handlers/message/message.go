@@ -25,6 +25,8 @@ func createMessageHandler(bot *b.Bot) telebot.HandlerFunc {
 			return nil
 		case fsmManager.StateAwaitingKey:
 			return createValidateActivationKey(bot)(ctx)
+		case fsmManager.StateAwaitingForwardChat:
+			return auth.CreateAuthMiddleware(bot)(createValidateForwardChatHandler(bot))(ctx)
 		default:
 			return nil
 		}

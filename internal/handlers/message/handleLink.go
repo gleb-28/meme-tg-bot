@@ -42,8 +42,13 @@ func createHandleLink(bot *b.Bot) telebot.HandlerFunc {
 		}
 
 		cleanFileName := utils.RemoveSaltFromFileName(utils.RemoveCompressedSuffix(name))
+
 		video := &telebot.Video{File: telebot.FromDisk(path), FileName: cleanFileName, CaptionAbove: true, Caption: cleanFileName}
-		bot.MustSend(chatId, video)
+		if forwardChatId, enabled := bot.ForwardModeService.GetForwardChat(chatId); enabled {
+			bot.MustSend(forwardChatId, video)
+		} else {
+			bot.MustSend(chatId, video)
+		}
 
 		bot.MustReact(userMsg, react.ThumbUp)
 		bot.MustDelete(botMsg)

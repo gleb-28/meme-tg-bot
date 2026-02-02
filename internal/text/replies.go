@@ -1,14 +1,25 @@
 package text
 
 type Replies struct {
-	Start              string
-	EnterKey           string
-	EnterKeySuccess    string
-	KeyAlreadyEntered  string
-	EnterKeyWrong      string
-	IsNotValidURLError string
-	Downloading        string
-	Error              string
+	Start                           string
+	EnterKey                        string
+	EnterKeySuccess                 string
+	KeyAlreadyEntered               string
+	EnterKeyWrong                   string
+	IsNotValidURLError              string
+	Downloading                     string
+	SelectTheMode                   string
+	EnableForwardingMode            string
+	DisableForwardingMode           string
+	ForwardMsgFromGroup             string
+	UnableToFindTheGroup            string
+	IMustBeAdminInTheGroup          string
+	SuccessEnablingForwardMode      string
+	ForwardingModeIsEnabled         string
+	ForwardingModeIsDisabled        string
+	ForwardingModeIsAlreadyEnabled  string
+	ForwardingModeIsAlreadyDisabled string
+	Error                           string
 }
 
 func NewReplies() *Replies {
@@ -20,6 +31,17 @@ func NewReplies() *Replies {
 		"Неверный ключ",
 		"По такой ссылке не могу скачать(",
 		"⏳",
+		"Выберите режим:",
+		"Включить режим пересылки",
+		"Выключить режим пересылки",
+		"Перешли сообщение от группы(!), куда пересылать видосы:",
+		"Не получилось определить групповой чат. Проверь что сообщение именно от группы",
+		"Я должен быть администратором в этом чате, чтобы пересылать туда видео",
+		"Режим пересылки включен! Видео будут отправляться в чатик ",
+		"Пересылка включена ✅",
+		"Пересылка выключена ❌",
+		"Режим пересылки уже включен ✅, используй команду /change_mode",
+		"Режим пересылки уже выключен ❌, используй команду /change_mode",
 		"Произошла ошибка :(",
 	}
 }

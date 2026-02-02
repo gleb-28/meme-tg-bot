@@ -10,18 +10,21 @@ import (
 )
 
 const (
-	StateInitial     = "initial"
-	StateAwaitingKey = "awaiting_key"
+	StateInitial             = "initial"
+	StateAwaitingKey         = "awaiting_key"
+	StateAwaitingForwardChat = "awaiting_forward_chat"
 )
 
 const (
-	InitialEvent     = "initial__event"
-	AwaitingKeyEvent = "awaiting_key__event"
+	InitialEvent             = "initial__event"
+	AwaitingKeyEvent         = "awaiting_key__event"
+	AwaitingForwardChatEvent = "awaiting_forward_chat__event"
 )
 
 var events = []f.EventDesc{
-	{Name: InitialEvent, Src: []string{StateInitial, StateAwaitingKey}, Dst: StateInitial},
+	{Name: InitialEvent, Src: []string{StateInitial, StateAwaitingKey, StateAwaitingForwardChat}, Dst: StateInitial},
 	{Name: AwaitingKeyEvent, Src: []string{StateInitial}, Dst: StateAwaitingKey},
+	{Name: AwaitingForwardChatEvent, Src: []string{StateInitial}, Dst: StateAwaitingForwardChat},
 }
 
 type FSMState struct {

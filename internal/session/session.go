@@ -8,7 +8,10 @@ import (
 )
 
 type Session struct {
-	ProcessingLinks map[string]*ProcessingLink
+	ProcessingLinks      map[string]*ProcessingLink
+	ForwardModeLoaded    bool
+	ForwardModeIsEnabled bool
+	ForwardChatId        int64
 }
 
 type ProcessingLink struct {
@@ -48,6 +51,8 @@ func (store *Store) Get(chatID int64) *Session {
 	return session
 }
 
+// --- ProcessingLinks ---
+
 func (store *Store) AddProcessingLink(chatID int64, key string, link *ProcessingLink) {
 	session := store.Get(chatID)
 
@@ -74,4 +79,40 @@ func (store *Store) RemoveProcessingLink(chatID int64, key string) {
 	defer store.mu.Unlock()
 
 	delete(session.ProcessingLinks, key)
+}
+
+// --- Forward Mode ---
+
+func (store *Store) IsForwardModeLoaded(chatID int64) bool {
+	session := store.Get(chatID)
+
+	store.mu.RLock()
+	defer store.mu.RUnlock()
+
+	return session.ForwardModeLoaded
+}
+
+func (store *Store) EnableForwardMode(chatID int64, forwardChatID int64) {
+	session := store.Get(chatID)
+	store.mu.Lock()
+	defer store.mu.Unlock()
+	session.ForwardModeIsEnabled = true
+	session.ForwardChatId = forwardChatID
+	session.ForwardModeLoaded = true
+}
+
+func (store *Store) DisableForwardMode(chatID int64) {
+	session := store.Get(chatID)
+	store.mu.Lock()
+	defer store.mu.Unlock()
+	session.ForwardModeIsEnabled = false
+	session.ForwardChatId = 0
+	session.ForwardModeLoaded = true
+}
+
+func (store *Store) GetForwardMode(chatID int64) (isEnabled bool, forwardChatID int64) {
+	session := store.Get(chatID)
+	store.mu.RLock()
+	defer store.mu.RUnlock()
+	return session.ForwardModeIsEnabled, session.ForwardChatId
 }
