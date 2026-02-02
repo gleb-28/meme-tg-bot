@@ -98,7 +98,6 @@ func (store *Store) EnableForwardMode(chatID int64, forwardChatID int64) {
 	defer store.mu.Unlock()
 	session.ForwardModeIsEnabled = true
 	session.ForwardChatId = forwardChatID
-	session.ForwardModeLoaded = true
 }
 
 func (store *Store) DisableForwardMode(chatID int64) {
@@ -106,8 +105,6 @@ func (store *Store) DisableForwardMode(chatID int64) {
 	store.mu.Lock()
 	defer store.mu.Unlock()
 	session.ForwardModeIsEnabled = false
-	session.ForwardChatId = 0
-	session.ForwardModeLoaded = true
 }
 
 func (store *Store) GetForwardMode(chatID int64) (isEnabled bool, forwardChatID int64) {
@@ -115,4 +112,13 @@ func (store *Store) GetForwardMode(chatID int64) (isEnabled bool, forwardChatID 
 	store.mu.RLock()
 	defer store.mu.RUnlock()
 	return session.ForwardModeIsEnabled, session.ForwardChatId
+}
+
+func (store *Store) SetForwardMode(chatID int64, isEnabled bool, forwardChatID int64) {
+	session := store.Get(chatID)
+	store.mu.Lock()
+	defer store.mu.Unlock()
+	session.ForwardModeIsEnabled = isEnabled
+	session.ForwardChatId = forwardChatID
+	session.ForwardModeLoaded = true
 }

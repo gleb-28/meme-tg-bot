@@ -63,11 +63,7 @@ func (s *Service) ensureForwardModeLoaded(userID int64) {
 
 	fm, err := s.forwardModeRepo.Get(userID)
 	if err == nil {
-		if fm.IsEnabled {
-			s.session.EnableForwardMode(userID, int64(fm.ChatID))
-		} else {
-			s.session.DisableForwardMode(userID)
-		}
+		s.session.SetForwardMode(userID, fm.IsEnabled, fm.ChatID)
 		return
 	}
 

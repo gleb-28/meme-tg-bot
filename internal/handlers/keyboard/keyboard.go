@@ -21,6 +21,10 @@ func createKeyboardHandlers(bot *b.Bot) telebot.HandlerFunc {
 			return createForwardModeEnabledHandler(bot)(ctx)
 		case constants.DisableForwardModeButtonCallbackQuery:
 			return createForwardModeDisabledHandler(bot)(ctx)
+		case constants.UsePrevForwardChatButtonCallbackQuery:
+			return createUsePrevForwardChatHandler(bot)(ctx)
+		case constants.ChangeForwardChatButtonCallbackQuery:
+			return createChangeForwardChatHandler(bot)(ctx)
 		default:
 			return nil
 		}

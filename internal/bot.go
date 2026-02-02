@@ -57,6 +57,11 @@ func (bot *Bot) MustReact(msg *telebot.Message, reaction telebot.Reaction) {
 	}
 }
 
+// TODO
+func MustEdit() {
+
+}
+
 func (bot *Bot) GetChatCached(chatId int64) (*models.Chat, error) {
 	bot.cacheLock.RLock()
 	chat, ok := bot.chatCache[chatId]

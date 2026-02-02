@@ -31,10 +31,7 @@ func (r *ForwardMode) Disable(userID int64) error {
 	return r.db.
 		Model(&models.ForwardMode{}).
 		Where("user_id = ?", userID).
-		Updates(map[string]interface{}{
-			"is_enabled": false,
-			"chat_id":    0,
-		}).
+		Update("is_enabled", false).
 		Error
 }
 
