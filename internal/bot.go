@@ -5,6 +5,7 @@ import (
 	"log"
 	"memetgbot/internal/core/config"
 	"memetgbot/internal/core/logger"
+	"memetgbot/internal/feat/forward"
 	fsmManager "memetgbot/internal/fsm"
 	"memetgbot/internal/repo"
 	"memetgbot/internal/session"
@@ -20,13 +21,15 @@ import (
 
 type Bot struct {
 	*telebot.Bot
-	Fsm          *fsmManager.FSMState
-	SessionStore *session.Store
-	chatRepo     *repo.ChatRepo
-	VideoService *video.VideoService
-	Config       *config.AppConfig
-	Replies      *text.Replies
-	Logger       logger.AppLogger
+	Fsm                *fsmManager.FSMState
+	SessionStore       *session.Store
+	chatRepo           *repo.ChatRepo
+	forwardModeRepo    *repo.ForwardMode
+	VideoService       *video.VideoService
+	ForwardModeService *forward.Service
+	Config             *config.AppConfig
+	Replies            *text.Replies
+	Logger             logger.AppLogger
 
 	chatCache map[int64]*models.Chat
 	cacheLock sync.RWMutex
@@ -77,6 +80,9 @@ func (bot *Bot) SaveChat(chat *models.Chat) error {
 	if err := bot.chatRepo.Upsert(chat); err != nil {
 		return err
 	}
+	if err := bot.forwardModeRepo.Disable(chat.TelegramID); err != nil {
+		return err
+	}
 
 	bot.setChatCache(chat.TelegramID, chat)
 
@@ -94,7 +100,9 @@ func MustBot(
 	fsm *fsmManager.FSMState,
 	sessionStore *session.Store,
 	chatRepo *repo.ChatRepo,
+	forwardModeRepo *repo.ForwardMode,
 	videoService *video.VideoService,
+	forwardModeService *forward.Service,
 	replies *text.Replies,
 	logger logger.AppLogger) *Bot {
 	bot, err := telebot.NewBot(telebot.Settings{
@@ -114,7 +122,9 @@ func MustBot(
 		fsm,
 		sessionStore,
 		chatRepo,
+		forwardModeRepo,
 		videoService,
+		forwardModeService,
 		config,
 		replies,
 		logger,

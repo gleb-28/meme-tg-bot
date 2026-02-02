@@ -35,7 +35,12 @@ func MustDB(config *config.AppConfig, logger logger.AppLogger) *gorm.DB {
 
 	err = db.AutoMigrate(&models.Chat{})
 	if err != nil {
-		log.Fatalf("Failed to AutoMigrate: " + err.Error())
+		log.Fatalf("Failed to AutoMigrate Chat: " + err.Error())
+	}
+
+	err = db.AutoMigrate(&models.ForwardMode{})
+	if err != nil {
+		log.Fatalf("Failed to AutoMigrate ForwardMode: " + err.Error())
 	}
 
 	return db

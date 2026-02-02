@@ -6,8 +6,10 @@ import (
 	"memetgbot/internal/core/constants"
 	l "memetgbot/internal/core/logger"
 	d "memetgbot/internal/db"
+	"memetgbot/internal/feat/forward"
 	fsmManager "memetgbot/internal/fsm"
 	"memetgbot/internal/handlers/commands"
+	"memetgbot/internal/handlers/keyboard"
 	"memetgbot/internal/handlers/message"
 	"memetgbot/internal/repo"
 	"memetgbot/internal/session"
@@ -18,16 +20,24 @@ import (
 func main() {
 	config := cfg.MustConfig()
 	logger := l.MustLogger(config.IsDebug, l.MustLoggerBot(config.LoggerBotToken), config.AdminID)
+
 	db := d.MustDB(config, logger)
+
 	fsm := fsmManager.New(logger)
 	sessionStore := session.NewStore(logger)
-	chatRepo := repo.NewChatRepo(db)
-	videoService := video.MustNewVideoService(constants.VideoDownloadDirPath, config.YtdlpPath, config.CookiesPath, config.FfmpegPath, logger)
-	replies := text.NewReplies()
-	bot := b.MustBot(config, fsm, sessionStore, chatRepo, videoService, replies, logger)
 
-	commands.MustInitCommands(bot)
+	chatRepo := repo.NewChatRepo(db)
+	forwardModeRepo := repo.NewForwardModeRepo(db)
+
+	videoService := video.MustNewVideoService(constants.VideoDownloadDirPath, config.YtdlpPath, config.CookiesPath, config.FfmpegPath, logger)
+	forwardModeService := forward.NewForwardModeService(forwardModeRepo, sessionStore, logger)
+
+	replies := text.NewReplies()
+	bot := b.MustBot(config, fsm, sessionStore, chatRepo, forwardModeRepo, videoService, forwardModeService, replies, logger)
+
+	commands.MustInitCommandsHandler(bot)
 	message.MustInitMessagesHandler(bot)
+	keyboard.MustInitKeyboardHandler(bot)
 
 	logger.Info("Bot successfully started!")
 	bot.Start()

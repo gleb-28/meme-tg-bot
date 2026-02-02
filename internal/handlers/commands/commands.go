@@ -10,9 +10,10 @@ import (
 var commands = []telebot.Command{
 	{Text: "start", Description: "Старт"},
 	{Text: "key", Description: "Ввести секретный ключ"},
+	{Text: "change_mode", Description: "Поменять режим"},
 }
 
-func MustInitCommands(bot *bot.Bot) {
+func MustInitCommandsHandler(bot *bot.Bot) {
 	err := bot.SetCommands(commands)
 	if err != nil {
 		panic("Failed to set commands: " + err.Error())
@@ -20,4 +21,5 @@ func MustInitCommands(bot *bot.Bot) {
 
 	bot.Handle("/start", createStartHandler(bot), auth.CreateAuthMiddleware(bot))
 	bot.Handle("/key", createKeyHandler(bot))
+	bot.Handle("/change_mode", createChangeModeHandler(bot), auth.CreateAuthMiddleware(bot))
 }
