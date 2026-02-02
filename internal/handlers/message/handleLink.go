@@ -2,6 +2,7 @@ package message
 
 import (
 	"context"
+	"fmt"
 	b "memetgbot/internal"
 	"memetgbot/internal/session"
 	"memetgbot/pkg/utils"
@@ -16,6 +17,7 @@ func createHandleLink(bot *b.Bot) telebot.HandlerFunc {
 	return func(ctx telebot.Context) error {
 		chatId := ctx.Chat().ID
 		userMsg := ctx.Message()
+		userName := ctx.Sender().Username
 		processingLinkKey := strconv.FormatInt(int64(userMsg.ID), 10)
 
 		botMsg := bot.MustSend(chatId, bot.Replies.Downloading)
@@ -43,11 +45,10 @@ func createHandleLink(bot *b.Bot) telebot.HandlerFunc {
 
 		cleanFileName := utils.RemoveSaltFromFileName(utils.RemoveCompressedSuffix(name))
 
-		video := &telebot.Video{File: telebot.FromDisk(path), FileName: cleanFileName, CaptionAbove: true, Caption: cleanFileName}
 		if forwardChatId, enabled := bot.ForwardModeService.GetForwardChat(chatId); enabled {
-			bot.MustSend(forwardChatId, video)
+			bot.MustSend(forwardChatId, video(path, cleanFileName, fmt.Sprintf("%v(от @%v)", cleanFileName, userName)))
 		} else {
-			bot.MustSend(chatId, video)
+			bot.MustSend(chatId, video(path, cleanFileName, cleanFileName))
 		}
 
 		bot.MustReact(userMsg, react.ThumbUp)
@@ -58,5 +59,13 @@ func createHandleLink(bot *b.Bot) telebot.HandlerFunc {
 		bot.SessionStore.RemoveProcessingLink(chatId, processingLinkKey)
 
 		return nil
+	}
+}
+
+func video(path string, name string, caption string) *telebot.Video {
+	return &telebot.Video{
+		File:     telebot.FromDisk(path),
+		FileName: name, CaptionAbove: true,
+		Caption: caption,
 	}
 }

@@ -80,9 +80,6 @@ func (bot *Bot) SaveChat(chat *models.Chat) error {
 	if err := bot.chatRepo.Upsert(chat); err != nil {
 		return err
 	}
-	if err := bot.forwardModeRepo.Disable(chat.TelegramID); err != nil {
-		return err
-	}
 
 	bot.setChatCache(chat.TelegramID, chat)
 

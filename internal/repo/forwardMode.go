@@ -28,16 +28,13 @@ func (r *ForwardMode) Enable(userID int64, chatId int64) error {
 }
 
 func (r *ForwardMode) Disable(userID int64) error {
-	fm := models.ForwardMode{
-		UserID:    userID,
-		IsEnabled: false,
-		ChatID:    0,
-	}
-
-	return r.db.Model(&models.ForwardMode{}).
+	return r.db.
+		Model(&models.ForwardMode{}).
 		Where("user_id = ?", userID).
-		Assign(&fm).
-		FirstOrCreate(&fm).
+		Updates(map[string]interface{}{
+			"is_enabled": false,
+			"chat_id":    0,
+		}).
 		Error
 }
 
