@@ -10,6 +10,7 @@
 *.bin
 *.db
 data/
+.ai
 
 # Test binary, built with `go test -c`
 *.test
