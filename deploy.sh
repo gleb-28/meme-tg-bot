@@ -20,6 +20,7 @@ rsync -avz --delete \
   --exclude 'tmp' \
   --exclude '.env' \
   --exclude '.vscode/' \
+  --exclude '.ai/' \
   --exclude 'data/bot.db' \
   ./ $VPS_USER@$VPS_HOST:$VPS_PATH
 
