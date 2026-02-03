@@ -1,4 +1,4 @@
-.PHONY: build down rebuild logs tidy run
+.PHONY: build down rebuild logs tidy run deploy
 
 # Docker commands
 build:
@@ -13,6 +13,9 @@ rebuild:
 logs:
 	@echo "Viewing Docker container logs (press Ctrl+C to exit)..."
 	docker-compose logs -f
+deploy:
+	./deploy.sh
+
 
 
 # Go commands
