@@ -26,10 +26,10 @@ func MustNewVideoService(downloadDir string, ytdlpPath string, cookiesPath strin
 	if _, err := os.Stat(downloadDir); os.IsNotExist(err) {
 		err = os.MkdirAll(downloadDir, 0755)
 		if err != nil {
-			log.Fatalf(fmt.Sprintf("failed to create download directory %s: %v", downloadDir, err))
+			log.Fatalf("failed to create download directory %s: %v", downloadDir, err)
 		}
 	} else if err != nil {
-		log.Fatalf(fmt.Sprintf("failed to stat download directory %s: %v", downloadDir, err))
+		log.Fatalf("failed to stat download directory %s: %v", downloadDir, err)
 	}
 
 	return &VideoService{
