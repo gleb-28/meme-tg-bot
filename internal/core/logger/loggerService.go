@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -39,7 +40,7 @@ func (logger *Logger) Error(message string) {
 }
 
 func MustLogger(isDebug bool, loggerBot *telebot.Bot, adminID int64) *Logger {
-	hasLoggerBot := loggerBot != nil || adminID != 0
+	hasLoggerBot := loggerBot != nil && adminID != 0
 	return &Logger{isDebug: isDebug, loggerBot: loggerBot, adminID: adminID, hasLoggerBot: hasLoggerBot}
 }
 
