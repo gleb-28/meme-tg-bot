@@ -9,4 +9,5 @@ services:
       IS_DOCKERIZED: "true"
     volumes:
       - ./data/cookies.txt:/app/cookies.txt
+      - ./data/bot.db:/app/data
     working_dir: /app

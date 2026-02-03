@@ -86,3 +86,20 @@ and set:
 ```env
 COOKIES_PATH=./data/cookies.txt
 ```
+
+## 🚀 VPS Deployment
+
+This guide shows how to deploy the bot on a fresh Ubuntu VPS using Docker.
+
+1. Create prod.env with and other constants:
+```env
+DB_FILE_NAME=/app/data/bot.db
+COOKIES_PATH=/app/cookies.txt
+YTDLP_PATH=/usr/local/bin/yt-dlp
+FFMPEG_PATH=/usr/bin/ffmpeg
+```
+
+2. Create deploy.env and run ./deploy.sh from your local machine:
+```
+sudo chmod +x ./deploy.sh && ./deploy.sh
+```

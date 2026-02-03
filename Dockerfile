@@ -20,7 +20,6 @@ WORKDIR /app
 RUN mkdir -p /app/data /app/.cache
 COPY --from=build /build/meme-bot .
 RUN chmod -R 777 /app
-ENV YT_DLP_PATH="/usr/bin/yt-dlp"
 ENV HOME=/app
 ENV XDG_CACHE_HOME=/app/.cache
 EXPOSE 8080
