@@ -1,17 +1,24 @@
 # 🤖 Meme TG Bot
 
-Telegram bot written in Go that allows you to download videos by links from popular social networks and platforms using yt-dlp.
+The Meme TG Bot is a Go-based Telegram bot that downloads videos from popular platforms.
+
+## 🧱 Tech stack
+
+- **Go 1.25** – primary language.
+- **Telebot v4** – Telegram framework.
+- **Looplab FSM** – FSM.
+- **GORM + sqlite driver** – persistence layer for chats and forward-mode settings (`gorm.io/gorm`, `gorm.io/driver/sqlite`).
+- **SQLite** – lightweight storage for bot data.
+- **yt-dlp** – downloads social-media videos (`github.com/lrstanley/go-ytdlp` wrapping the binary).
+- **ffmpeg** – compresses downloaded videos before sending.
+- **cleanenv** – loads `.env` file.
 
 The bot supports:
 
 - 📥 Downloading videos from popular platforms (YouTube, TikTok, Instagram, Twitter/X, etc.)
-
-- 🍪 Cookie-based authentication to bypass login and CAPTCHA restrictions
-
+- 📥 Forward mode to chosen chat
 - 💾 SQLite database for storing bot data
-
 - ⚡ Fast processing with in-memory caching
-
 -   🛠 Easy setup with Makefile and environment variables
 
 
@@ -103,3 +110,14 @@ FFMPEG_PATH=/usr/bin/ffmpeg
 ```
 sudo chmod +x ./deploy.sh && ./deploy.sh
 ```
+
+## 🧱 Tech stack
+
+- **Go 1.25** – primary language; follow https://go.dev/ref/spec and https://go.dev/doc/effective_go for contributions.
+- **Telebot v4** – Telegram framework (`gopkg.in/telebot.v4`), handles commands and callbacks.
+- **Looplab FSM** – tracks user states for activation/forward workflows (`github.com/looplab/fsm`).
+- **cleanenv** – loads `.env` and enforces required fields via struct tags (`github.com/ilyakaznacheev/cleanenv`).
+- **GORM + sqlite driver** – persistence layer for chats and forward-mode settings (`gorm.io/gorm`, `gorm.io/driver/sqlite`); updates follow https://gorm.io/docs/update.html.
+- **yt-dlp** – downloads social-media videos (`github.com/lrstanley/go-ytdlp` wrapping the binary).
+- **ffmpeg** – compresses downloaded videos before sending.
+- **SQLite** – lightweight storage for bot data (`sqlite3` binary).
