@@ -1,0 +1,12 @@
+services:
+  meme-bot:
+    build: .
+    container_name: meme-bot
+    restart: unless-stopped
+    env_file:
+      - ./prod.env
+    environment:
+      IS_DOCKERIZED: "true"
+    volumes:
+      - ./data/cookies.txt:/app/cookies.txt
+    working_dir: /app

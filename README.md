@@ -45,8 +45,8 @@ TG_BOT_TOKEN=              # REQUIRED - Telegram bot token
 LOGGER_BOT_TOKEN=          # OPTIONAL (if used for logging bot)
 ADMIN_ID=                  # REQUIRED - Telegram admin user ID
 ACTIVATION_KEY=            # REQUIRED - password to use the bot
-DB_FILE_NAME=              # REQUIRED - SQLite db file (*.db)
-COOKIES_PATH=cookies.txt   # REQUIRED - path to cookies file
+DB_FILE_NAME=./data/bot.db # REQUIRED - SQLite db file (*.db)
+COOKIES_PATH=./data/cookies.txt # REQUIRED - path to cookies file
 YTDLP_PATH=/usr/bin/yt-dlp # REQUIRED - yt-dlp binary path
 FFMPEG_PATH=/usr/bin/ffmpeg # REQUIRED - ffmpeg binary path
 IS_DEBUG=false             # OPTIONAL - print logs for debugging
@@ -84,5 +84,5 @@ cookies.txt
 ```
 and set:
 ```env
-COOKIES_PATH=cookies.txt
+COOKIES_PATH=./data/cookies.txt
 ```

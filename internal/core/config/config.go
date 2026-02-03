@@ -25,9 +25,11 @@ type DatabaseConfig struct {
 }
 
 func MustConfig() *AppConfig {
-	err := g.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file (might be missing in non-dockerized env):", err.Error())
+	if os.Getenv("IS_DOCKERIZED") != "true" {
+		err := g.Load()
+		if err != nil {
+			log.Fatal("Error loading .env file (might be missing in non-dockerized env):", err.Error())
+		}
 	}
 
 	config := &AppConfig{}

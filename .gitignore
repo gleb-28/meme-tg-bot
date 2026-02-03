@@ -9,7 +9,7 @@
 *.gem
 *.bin
 *.db
-cookies.txt
+data/
 
 # Test binary, built with `go test -c`
 *.test
