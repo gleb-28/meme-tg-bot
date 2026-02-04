@@ -5,8 +5,8 @@
 - `internal/core/config/config.go:27-79` uses `cleanenv` with struct tags, reads `.env` only when `IS_DOCKERIZED` is not `true`, and always validates env vars via `cleanenv.ReadEnv`, ensuring both local and container deployments succeed with minimal custom logic.
 - SQLite connection and migrations live in `internal/db/db.go:1-46`, models reside in `models/chat.go:7-20`. Direct any storage-related questions (user or forward-mode persistence) to these files.
 - Commands (`/start`, `/key`, `/change_mode`) and authentication live in `internal/handlers/commands` (see `commands.go:1-25`, `key.go:11-25`, `changeMode.go:1-16`), while FSM states (`StateInitial`, `StateAwaitingKey`, `StateAwaitingForwardChat`) are defined in `internal/fsm/fsm.go:1-78`.
-- Text and link handling runs through `internal/handlers/message/message.go:1-34`, with specific handlers in `handleLink.go:1-73`, `handleMessage.go:1-17`, `validateActivationKey.go:1-31`, and `validateForwardChat.go:1-52`. The FSM decides when to route to each handler.
-- Forward-mode logic lives across keyboard handlers (`internal/handlers/keyboard/keyboard.go:1-32`, `forwardMode.go:14-140`), the service in `internal/feat/forward/service.go:1-71`, repository `internal/repo/forwardMode.go:1-55`, and session store `internal/session/session.go:10-124`.
+- Text and link handling runs through `internal/handlers/message/message.go:1-34`, with specific handlers in `handleLink.go:1-73`, `handleMessage.go:1-17`, `validateActivationKey.go:1-31`, and `validateForwardChat.go:1-52`. The FSM decides when to route to each handler; `handleMessage.go` now also relays non-link content via `internal/bot.go:1-190` and the session helpers in `internal/session/session.go:1-140`.
+- Forward-mode logic lives across keyboard handlers (`internal/handlers/keyboard/keyboard.go:1-32`, `forwardMode.go:14-140`), the service in `internal/feat/forward/service.go:1-71`, repository `internal/repo/forwardMode.go:1-55`, the message relay in `internal/bot.go:1-190`, and the expanded session store in `internal/session/session.go:1-140`.
 - Video download/compression is handled in `pkg/video/video.go:1-177`, with helper utilities in `pkg/utils/*.go`. Watch for directory creation, file renaming, salting, compression, and cleanup.
 - User-facing replies are centralized in `internal/text/replies.go:1-24`. Update this file whenever text changes are needed.
 - Repository commands live in `Makefile:1-31`, covering `run`, `test`, `tidy`, Docker `build/down/rebuild`, and `deploy`.
@@ -35,3 +35,4 @@
 - Check how tests or scripts are expected to run (e.g., `go test ./... -v`) before editing.
 - Always suggest a follow-up step (“verify migrations”, “run `make tidy` and tests”).
 - Highlight env/config changes with references to `internal/core/config/config.go:27-80`.
+- Deployment helpers now live under `deploy/` (script, compose manifest, Dockerfile, and env templates) and the Makefile’s docker targets point at `deploy/docker-compose.yml`; keep this layout in mind when talking about builds or deployment.
