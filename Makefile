@@ -1,21 +1,22 @@
+COMPOSE_FILE=deploy/docker-compose.yml
+
 .PHONY: build down rebuild logs tidy run deploy
 
 # Docker commands
 build:
 	@echo "Building Docker images..."
-	docker-compose up -d
+	docker-compose -f $(COMPOSE_FILE) up -d
 down:
 	@echo "Stopping Docker containers and cleaning up volumes and images..."
-	docker-compose down -v --rmi all
+	docker-compose -f $(COMPOSE_FILE) down -v --rmi all
 rebuild:
 	@echo "Rebuilding and restarting Docker containers..."
-	docker-compose up -d --build
+	docker-compose -f $(COMPOSE_FILE) up -d --build
 logs:
 	@echo "Viewing Docker container logs (press Ctrl+C to exit)..."
-	docker-compose logs -f
+	docker-compose -f $(COMPOSE_FILE) logs -f
 deploy:
-	./deploy.sh
-
+	./deploy/deploy.sh
 
 
 # Go commands

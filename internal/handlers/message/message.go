@@ -10,6 +10,13 @@ import (
 
 func MustInitMessagesHandler(bot *b.Bot) {
 	bot.Handle(telebot.OnText, createMessageHandler(bot))
+	bot.Handle(telebot.OnAudio, createMessageHandler(bot))
+	bot.Handle(telebot.OnDocument, createMessageHandler(bot))
+	bot.Handle(telebot.OnPhoto, createMessageHandler(bot))
+	bot.Handle(telebot.OnVideo, createMessageHandler(bot))
+	bot.Handle(telebot.OnAnimation, createMessageHandler(bot))
+	bot.Handle(telebot.OnSticker, createMessageHandler(bot))
+	bot.Handle(telebot.OnVoice, createMessageHandler(bot))
 }
 
 func createMessageHandler(bot *b.Bot) telebot.HandlerFunc {

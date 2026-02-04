@@ -3,12 +3,14 @@ package session
 import (
 	"memetgbot/internal/core/logger"
 	"sync"
+	"time"
 
 	"gopkg.in/telebot.v4"
 )
 
 type Session struct {
 	ProcessingLinks      map[string]*ProcessingLink
+	MediaBatch           *MediaBatch
 	ForwardModeLoaded    bool
 	ForwardModeIsEnabled bool
 	ForwardChatId        int64
@@ -17,6 +19,12 @@ type Session struct {
 type ProcessingLink struct {
 	UserMsg *telebot.Message // user msg with link
 	BotMsg  *telebot.Message // bot reply with "downloading" state
+}
+
+type MediaBatch struct {
+	Items   []telebot.Inputtable
+	Caption string
+	Timer   *time.Timer
 }
 
 type Store struct {
@@ -121,4 +129,25 @@ func (store *Store) SetForwardMode(chatID int64, isEnabled bool, forwardChatID i
 	session.ForwardModeIsEnabled = isEnabled
 	session.ForwardChatId = forwardChatID
 	session.ForwardModeLoaded = true
+}
+
+func (store *Store) GetMediaBatch(chatID int64) (*MediaBatch, bool) {
+	session := store.Get(chatID)
+	store.mu.Lock()
+	defer store.mu.Unlock()
+	return session.MediaBatch, session.MediaBatch != nil
+}
+
+func (store *Store) SetMediaBatch(chatID int64, batch *MediaBatch) {
+	session := store.Get(chatID)
+	store.mu.Lock()
+	defer store.mu.Unlock()
+	session.MediaBatch = batch
+}
+
+func (store *Store) DeleteMediaBatch(chatID int64) {
+	session := store.Get(chatID)
+	store.mu.Lock()
+	defer store.mu.Unlock()
+	session.MediaBatch = nil
 }
