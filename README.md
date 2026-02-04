@@ -17,6 +17,7 @@ The bot supports:
 
 - 📥 Downloading videos from popular platforms (YouTube, TikTok, Instagram, Twitter/X, etc.)
 - 📥 Forward mode to chosen chat
+- Forwarding audio, video, docs, pics, stickers, voices, GIFs, albums in forward mode
 - 💾 SQLite database for storing bot data
 - ⚡ Fast processing with in-memory caching
 -   🛠 Easy setup with Makefile and environment variables
@@ -111,14 +112,3 @@ FFMPEG_PATH=/usr/bin/ffmpeg
 ```
 sudo chmod +x deploy/deploy.sh && make deploy
 ```
-
-## 🧱 Tech stack
-
-- **Go 1.25** – primary language; follow https://go.dev/ref/spec and https://go.dev/doc/effective_go for contributions.
-- **Telebot v4** – Telegram framework (`gopkg.in/telebot.v4`), handles commands and callbacks.
-- **Looplab FSM** – tracks user states for activation/forward workflows (`github.com/looplab/fsm`).
-- **cleanenv** – loads `.env` and enforces required fields via struct tags (`github.com/ilyakaznacheev/cleanenv`).
-- **GORM + sqlite driver** – persistence layer for chats and forward-mode settings (`gorm.io/gorm`, `gorm.io/driver/sqlite`); updates follow https://gorm.io/docs/update.html.
-- **yt-dlp** – downloads social-media videos (`github.com/lrstanley/go-ytdlp` wrapping the binary).
-- **ffmpeg** – compresses downloaded videos before sending.
-- **SQLite** – lightweight storage for bot data (`sqlite3` binary).
