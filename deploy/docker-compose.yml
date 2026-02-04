@@ -1,6 +1,8 @@
 services:
   meme-bot:
-    build: .
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
     container_name: meme-bot
     restart: unless-stopped
     env_file:
@@ -8,6 +10,6 @@ services:
     environment:
       IS_DOCKERIZED: "true"
     volumes:
-      - ./data/cookies.txt:/app/cookies.txt
-      - ./data/bot.db:/app/data
+      - ../data/cookies.txt:/app/cookies.txt
+      - ../data/bot.db:/app/data
     working_dir: /app

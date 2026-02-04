@@ -2,11 +2,14 @@
 
 # ===== Load deploy config =====
 set -e
-if [ ! -f "deploy.env" ]; then
-    echo "❌ .env.deploy not found!"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+if [ ! -f "$SCRIPT_DIR/deploy.env" ]; then
+    echo "❌ deploy.env not found!"
     exit 1
 fi
-export $(grep -v '^#' deploy.env | xargs)
+export $(grep -v '^#' "$SCRIPT_DIR/deploy.env" | xargs)
 
 # ==================
 
@@ -22,12 +25,12 @@ rsync -avz --delete \
   --exclude '.vscode/' \
   --exclude '.ai/' \
   --exclude 'data/bot.db' \
-  ./ $VPS_USER@$VPS_HOST:$VPS_PATH
+  "$PROJECT_ROOT/" "$VPS_USER@$VPS_HOST:$VPS_PATH"
 
 echo "📦 Files synced."
 
 # ---------- Remote setup + run ----------
-ssh $VPS_USER@$VPS_HOST << 'EOF'
+ssh $VPS_USER@$VPS_HOST <<'EOF'
 set -e
 
 echo "🔧 Installing dependencies..."
@@ -52,7 +55,7 @@ echo "📁 Preparing folders..."
 mkdir -p /home/meme-bot/data
 
 echo "🐳 Building & starting containers..."
-cd /home/meme-bot
+cd /home/meme-bot/deploy
 
 docker-compose down || true
 docker-compose build

@@ -97,6 +97,7 @@ COOKIES_PATH=./data/cookies.txt
 ## 🚀 VPS Deployment
 
 This guide shows how to deploy the bot on a fresh Ubuntu VPS using Docker.
+All deployment assets (compose file, helper script, Dockerfile, and env templates) live under `deploy/`.
 
 1. Create prod.env with and other constants:
 ```env
@@ -106,9 +107,9 @@ YTDLP_PATH=/usr/local/bin/yt-dlp
 FFMPEG_PATH=/usr/bin/ffmpeg
 ```
 
-2. Create deploy.env and run ./deploy.sh from your local machine:
+2. Create `deploy/prod.env` (if you need to override the defaults above) and `deploy/deploy.env`, then run the deploy helper from the repo root:
 ```
-sudo chmod +x ./deploy.sh && ./deploy.sh
+sudo chmod +x deploy/deploy.sh && make deploy
 ```
 
 ## 🧱 Tech stack
