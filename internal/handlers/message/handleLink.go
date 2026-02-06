@@ -48,7 +48,7 @@ func createHandleLink(bot *b.Bot) telebot.HandlerFunc {
 		if forwardChatId, enabled := bot.ForwardModeService.GetForwardChat(chatId); enabled {
 			bot.MustSend(forwardChatId,
 				video(path, cleanFileName,
-					fmt.Sprintf("%v(%v)", cleanFileName, userFirstName)))
+					fmt.Sprintf(bot.Replies.ValueFromName, cleanFileName, userFirstName)))
 		} else {
 			bot.MustSend(chatId, video(path, cleanFileName, cleanFileName))
 		}

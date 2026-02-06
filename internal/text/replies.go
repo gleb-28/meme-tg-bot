@@ -24,6 +24,7 @@ type Replies struct {
 	ForwardingModeIsAlreadyEnabled  string
 	ForwardingModeIsAlreadyDisabled string
 	CannotChatYet                   string
+	ValueFromName                   string
 	Says                            string
 	Sends                           string
 	Error                           string
@@ -54,6 +55,7 @@ func NewReplies() *Replies {
 		"Режим пересылки уже включен ✅, используй команду /change_mode",
 		"Режим пересылки уже выключен ❌, используй команду /change_mode",
 		"Я пока не умею общаться, но могу пересылать сообщения, если включишь режим через /change_mode",
+		"%v(от %v)",
 		"говорит",
 		"присылает",
 		"Произошла ошибка :(",
