@@ -3,7 +3,7 @@ package keyboard
 import (
 	b "memetgbot/internal"
 	"memetgbot/internal/core/constants"
-	"memetgbot/internal/handlers/auth"
+	"memetgbot/internal/middleware/auth"
 	"strings"
 
 	"gopkg.in/telebot.v4"

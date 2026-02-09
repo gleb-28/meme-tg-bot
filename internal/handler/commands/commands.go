@@ -2,7 +2,7 @@ package commands
 
 import (
 	bot "memetgbot/internal"
-	"memetgbot/internal/handlers/auth"
+	"memetgbot/internal/middleware/auth"
 
 	"gopkg.in/telebot.v4"
 )

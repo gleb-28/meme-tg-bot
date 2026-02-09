@@ -5,7 +5,7 @@ import (
 	"fmt"
 	b "memetgbot/internal"
 	fsmManager "memetgbot/internal/fsm"
-	"memetgbot/internal/handlers/keyboard"
+	"memetgbot/internal/handler/keyboard"
 
 	"gopkg.in/telebot.v4"
 )

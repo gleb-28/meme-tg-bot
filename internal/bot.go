@@ -11,7 +11,7 @@ import (
 	"memetgbot/internal/repo"
 	"memetgbot/internal/session"
 	"memetgbot/internal/text"
-	"memetgbot/models"
+	"memetgbot/model"
 	"memetgbot/pkg/video"
 	"sync"
 	"time"
@@ -32,7 +32,7 @@ type Bot struct {
 	Replies            *text.Replies
 	Logger             logger.AppLogger
 
-	chatCache map[int64]*models.Chat
+	chatCache map[int64]*model.Chat
 	cacheLock sync.RWMutex
 }
 
@@ -250,7 +250,7 @@ func (bot *Bot) handleAlbumGroup(ctx telebot.Context, forwardChatId int64) {
 	}
 }
 
-func (bot *Bot) GetChatCached(chatId int64) (*models.Chat, error) {
+func (bot *Bot) GetChatCached(chatId int64) (*model.Chat, error) {
 	bot.cacheLock.RLock()
 	chat, ok := bot.chatCache[chatId]
 	bot.cacheLock.RUnlock()
@@ -269,7 +269,7 @@ func (bot *Bot) GetChatCached(chatId int64) (*models.Chat, error) {
 	return &chatDB, nil
 }
 
-func (bot *Bot) SaveChat(chat *models.Chat) error {
+func (bot *Bot) SaveChat(chat *model.Chat) error {
 	if err := bot.chatRepo.Upsert(chat); err != nil {
 		return err
 	}
@@ -279,7 +279,7 @@ func (bot *Bot) SaveChat(chat *models.Chat) error {
 	return nil
 }
 
-func (bot *Bot) setChatCache(chatId int64, chat *models.Chat) {
+func (bot *Bot) setChatCache(chatId int64, chat *model.Chat) {
 	bot.cacheLock.Lock()
 	defer bot.cacheLock.Unlock()
 	bot.chatCache[chatId] = chat
@@ -318,7 +318,7 @@ func MustBot(
 		config,
 		replies,
 		logger,
-		make(map[int64]*models.Chat),
+		make(map[int64]*model.Chat),
 		sync.RWMutex{},
 	}
 }

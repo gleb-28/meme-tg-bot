@@ -5,7 +5,7 @@ import (
 	"log"
 	"memetgbot/internal/core/config"
 	"memetgbot/internal/core/logger"
-	"memetgbot/models"
+	"memetgbot/model"
 	"time"
 
 	"gorm.io/driver/sqlite"
@@ -33,12 +33,12 @@ func MustDB(config *config.AppConfig, logger logger.AppLogger) *gorm.DB {
 		log.Fatalf("Failed to connect to database after %d attempts: %v", maxRetries, err)
 	}
 
-	err = db.AutoMigrate(&models.Chat{})
+	err = db.AutoMigrate(&model.Chat{})
 	if err != nil {
 		log.Fatal("Failed to AutoMigrate Chat: " + err.Error())
 	}
 
-	err = db.AutoMigrate(&models.ForwardMode{})
+	err = db.AutoMigrate(&model.ForwardMode{})
 	if err != nil {
 		log.Fatal("Failed to AutoMigrate ForwardMode: " + err.Error())
 	}

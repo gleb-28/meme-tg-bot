@@ -1,7 +1,7 @@
 package repo
 
 import (
-	"memetgbot/models"
+	"memetgbot/model"
 
 	"gorm.io/gorm"
 )
@@ -15,12 +15,12 @@ func NewForwardModeRepo(db *gorm.DB) *ForwardMode {
 }
 
 func (r *ForwardMode) Enable(userID int64, chatId int64) error {
-	fm := models.ForwardMode{
+	fm := model.ForwardMode{
 		UserID:    userID,
 		IsEnabled: true,
 		ChatID:    chatId,
 	}
-	return r.db.Model(&models.ForwardMode{}).
+	return r.db.Model(&model.ForwardMode{}).
 		Where("user_id = ?", userID).
 		Assign(fm).
 		FirstOrCreate(&fm).
@@ -29,16 +29,16 @@ func (r *ForwardMode) Enable(userID int64, chatId int64) error {
 
 func (r *ForwardMode) Disable(userID int64) error {
 	return r.db.
-		Model(&models.ForwardMode{}).
+		Model(&model.ForwardMode{}).
 		Where("user_id = ?", userID).
 		Update("is_enabled", false).
 		Error
 }
 
-func (r *ForwardMode) Get(userID int64) (models.ForwardMode, error) {
-	var result models.ForwardMode
+func (r *ForwardMode) Get(userID int64) (model.ForwardMode, error) {
+	var result model.ForwardMode
 
-	resp := r.db.Find(&models.ForwardMode{}, &models.ForwardMode{UserID: userID}).Scan(&result)
+	resp := r.db.Find(&model.ForwardMode{}, &model.ForwardMode{UserID: userID}).Scan(&result)
 
 	return result, resp.Error
 }

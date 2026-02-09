@@ -13,6 +13,12 @@
 3. Ensure `DB_FILE_NAME` points to a writable path (for example `./data/bot.db`).
 4. If you run the bot in Docker, set `IS_DOCKERIZED=true` and provide environment variables via the compose/env files.
 
+## Project layout (quick map)
+- Bot wiring: `cmd/bot/main.go`
+- Handlers: `internal/handler/{commands,message,keyboard}`; auth middleware lives in `internal/middleware/auth`
+- Forward mode: `internal/feat/forward` with per-user session cache in `internal/session`
+- Data: models in `model/chat.go`, repos in `internal/repo`, SQLite setup in `internal/db`
+
 ## Run locally
 - `make run` (or `go run cmd/bot/main.go`).
 

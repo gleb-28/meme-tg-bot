@@ -3,7 +3,7 @@ package message
 import (
 	b "memetgbot/internal"
 	fsmManager "memetgbot/internal/fsm"
-	"memetgbot/internal/handlers/auth"
+	"memetgbot/internal/middleware/auth"
 
 	"gopkg.in/telebot.v4"
 )

@@ -2,7 +2,7 @@ package commands
 
 import (
 	b "memetgbot/internal"
-	"memetgbot/internal/handlers/keyboard"
+	"memetgbot/internal/handler/keyboard"
 
 	"gopkg.in/telebot.v4"
 )
