@@ -38,7 +38,7 @@ func createForwardModeEnabledHandler(bot *b.Bot) telebot.HandlerFunc {
 			return nil
 		}
 
-		ctx.Edit(
+		bot.MustEdit(ctx.Message(),
 			fmt.Sprintf("%v: \"%v\"\n%v",
 				bot.Replies.YouHaveThisForwardChat, forwardChat.Title, bot.Replies.UseItAgain),
 			usePreviousForwardChatKeyboard(bot.Replies))
@@ -85,7 +85,7 @@ func createUsePrevForwardChatHandler(bot *b.Bot) telebot.HandlerFunc {
 		}
 
 		bot.MustSend(chatId, fmt.Sprintf("%v\"%v\"", bot.Replies.SuccessEnablingForwardMode, forwardChat.Title))
-		ctx.Edit(bot.Replies.ForwardingModeIsEnabled, ForwardModeKeyboard(true, bot.Replies))
+		bot.MustEdit(ctx.Message(), bot.Replies.ForwardingModeIsEnabled, ForwardModeKeyboard(true, bot.Replies))
 
 		return nil
 	}
@@ -106,7 +106,8 @@ func createForwardModeDisabledHandler(bot *b.Bot) telebot.HandlerFunc {
 			bot.Logger.Error(fmt.Sprintf("Error disabling forward mode to %v: %v", chatId, err.Error()))
 		}
 
-		return ctx.Edit(bot.Replies.ForwardingModeIsDisabled, ForwardModeKeyboard(false, bot.Replies))
+		bot.MustEdit(ctx.Message(), bot.Replies.ForwardingModeIsDisabled, ForwardModeKeyboard(false, bot.Replies))
+		return nil
 	}
 }
 

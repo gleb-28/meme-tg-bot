@@ -66,8 +66,13 @@ func (bot *Bot) MustReact(msg *telebot.Message, reaction telebot.Reaction) {
 	}
 }
 
-// TODO
-func MustEdit() {}
+func (bot *Bot) MustEdit(msg telebot.Editable, what interface{}, opts ...interface{}) *telebot.Message {
+	m, err := bot.Edit(msg, what, opts...)
+	if err != nil {
+		bot.Logger.Error(fmt.Sprintf("Error editing message: %v", err.Error()))
+	}
+	return m
+}
 
 func (bot *Bot) ForwardAnyMessage(ctx telebot.Context, forwardChatId int64) {
 	msg := ctx.Message()

@@ -21,7 +21,6 @@
 
 ### P2 — soon
 
-- [ ] **Add bot.MustEdit method**
 - [ ] **Clear session cache for non-auth users**
 - [ ] **Improve yt-dlp error handling and user feedback**
 - [ ] **Add rate limiting and abuse protection**
@@ -35,4 +34,5 @@
 
 
 ## Done
- 
+
+- [x] **Add bot.MustEdit method**

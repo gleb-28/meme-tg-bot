@@ -43,7 +43,7 @@ func createValidateForwardChatHandler(bot *b.Bot) telebot.HandlerFunc {
 		}
 
 		bot.MustSend(chatId, fmt.Sprintf("%v\"%v\"", bot.Replies.SuccessEnablingForwardMode, forwardChat.Title))
-		ctx.Edit(bot.Replies.ForwardingModeIsEnabled, keyboard.ForwardModeKeyboard(true, bot.Replies))
+		bot.MustEdit(ctx.Message(), bot.Replies.ForwardingModeIsEnabled, keyboard.ForwardModeKeyboard(true, bot.Replies))
 
 		bot.Fsm.UserEvent(context.Background(), chatId, fsmManager.InitialEvent)
 

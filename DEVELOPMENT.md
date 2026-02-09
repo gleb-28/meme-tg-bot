@@ -36,3 +36,4 @@
 - Downloads go to `./output` (created on startup).
 - Forward mode requires the bot to be an admin in the target group.
 - Set `IS_DEBUG=true` for verbose logs.
+- Prefer `bot.MustEdit(msg, ...)` when you need to edit a message without handling errors manually; it logs failures automatically.
