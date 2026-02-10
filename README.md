@@ -10,12 +10,14 @@ The Meme TG Bot is a Go-based Telegram bot that downloads videos from popular pl
 - **GORM + sqlite driver** – persistence layer for chats and forward-mode settings (`gorm.io/gorm`, `gorm.io/driver/sqlite`).
 - **SQLite** – lightweight storage for bot data.
 - **yt-dlp** – downloads social-media videos (`github.com/lrstanley/go-ytdlp` wrapping the binary).
+- **gallery-dl** – grabs Instagram photos/albums when `yt-dlp` only returns static media; it consumes the same cookies file.
 - **ffmpeg** – compresses downloaded videos before sending.
 - **cleanenv** – loads `.env` file.
 
 The bot supports:
 
 - 📥 Downloading videos from popular platforms (YouTube, TikTok, Instagram, Twitter/X, etc.)
+- 📸 Downloading Instagram photos/albums via `gallery-dl` whenever a video stream isn't available
 - 📥 Forward mode to chosen chat
 - Forwarding audio, video, docs, pics, stickers, voices, GIFs, albums in forward mode
 - 💾 SQLite database for storing bot data
@@ -30,6 +32,7 @@ Before running the bot make sure you have installed:
 - yt-dlp
 - SQLite
 - ffmpeg
+- gallery-dl (Python 3 CLI for fetching Instagram photos; install via `pip install --user gallery-dl` or your distro package)
 
 Check installed versions:
 ```bash
@@ -37,6 +40,7 @@ go version
 yt-dlp --version
 sqlite3 --version
 ffmpeg -version
+gallery-dl -version
 ````
 
 fedora example installing ffmpeg:
@@ -95,10 +99,12 @@ and set:
 COOKIES_PATH=./data/cookies.txt
 ```
 
+Both `yt-dlp` and the new `gallery-dl` Instagram image extractor consume the same cookies file, so keep `COOKIES_PATH` pointed at the export you generated.
+
 ## 🚀 VPS Deployment
 
 This guide shows how to deploy the bot on a fresh Ubuntu VPS using Docker.
-All deployment assets (compose file, helper script, Dockerfile, and env templates) live under `deploy/`.
+All deployment assets (compose file, helper script, Dockerfile, and env templates) live under `deploy/`. The Dockerfile now installs `gallery-dl`, so Instagram image downloads keep working inside the container.
 
 1. Create prod.env with and other constants:
 ```env

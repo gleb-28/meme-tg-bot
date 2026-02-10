@@ -13,6 +13,7 @@ RUN apt update && apt install -y \
     curl \
     sqlite3 \
     ca-certificates \
+    gallery-dl \
  && rm -rf /var/lib/apt/lists/*
 RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
         -o /usr/local/bin/yt-dlp && chmod +x /usr/local/bin/yt-dlp

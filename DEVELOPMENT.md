@@ -4,12 +4,14 @@
 - Go 1.25
 - yt-dlp
 - ffmpeg
+- gallery-dl (Python 3 CLI for Instagram images; install via `pip install --user gallery-dl` or your distro package)
 - sqlite3
 - Telegram bot token and admin user ID
 
 ## Setup
 1. Copy `.env.example` to `.env` and fill in the values.
 2. Ensure `COOKIES_PATH` points to a real cookies file (for example `./data/cookies.txt`).
+   The Instagram image extractor also consumes this file via `gallery-dl`, so keep it accessible at the same path.
 3. Ensure `DB_FILE_NAME` points to a writable path (for example `./data/bot.db`).
 4. If you run the bot in Docker, set `IS_DOCKERIZED=true` and provide environment variables via the compose/env files.
 

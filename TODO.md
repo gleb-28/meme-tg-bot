@@ -14,7 +14,6 @@
 
 ### P1 — critical
 
-- [ ] **Handle yt-dlp can't process Instagram images**
 - [ ] **Add timeouts and cancellation for long-running operations**
 - [ ] **Prevent forward-mode loops and self-triggering**
   _Notes_: Ignore messages coming from the forward chat itself, Ignore messages sent by the bot
@@ -36,3 +35,4 @@
 ## Done
 
 - [x] **Add bot.MustEdit method**
+- [x] **Handle yt-dlp can't process Instagram images**

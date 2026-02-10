@@ -7,12 +7,12 @@ import (
 	"memetgbot/internal/core/constants"
 	"memetgbot/internal/core/logger"
 	"memetgbot/internal/feat/forward"
+	"memetgbot/internal/feat/media"
 	fsmManager "memetgbot/internal/fsm"
 	"memetgbot/internal/repo"
 	"memetgbot/internal/session"
 	"memetgbot/internal/text"
 	"memetgbot/model"
-	"memetgbot/pkg/video"
 	"sync"
 	"time"
 
@@ -26,7 +26,7 @@ type Bot struct {
 	SessionStore       *session.Store
 	chatRepo           *repo.ChatRepo
 	forwardModeRepo    *repo.ForwardMode
-	VideoService       *video.VideoService
+	MediaService       *media.Service
 	ForwardModeService *forward.Service
 	Config             *config.AppConfig
 	Replies            *text.Replies
@@ -296,7 +296,7 @@ func MustBot(
 	sessionStore *session.Store,
 	chatRepo *repo.ChatRepo,
 	forwardModeRepo *repo.ForwardMode,
-	videoService *video.VideoService,
+	mediaService *media.Service,
 	forwardModeService *forward.Service,
 	replies *text.Replies,
 	logger logger.AppLogger) *Bot {
@@ -318,7 +318,7 @@ func MustBot(
 		sessionStore,
 		chatRepo,
 		forwardModeRepo,
-		videoService,
+		mediaService,
 		forwardModeService,
 		config,
 		replies,

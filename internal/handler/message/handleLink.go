@@ -5,6 +5,7 @@ import (
 	"fmt"
 	b "memetgbot/internal"
 	"memetgbot/internal/session"
+	"memetgbot/model"
 	"memetgbot/pkg/utils"
 	"strconv"
 	"strings"
@@ -27,7 +28,7 @@ func createHandleLink(bot *b.Bot) telebot.HandlerFunc {
 			BotMsg:  botMsg,
 		})
 
-		path, name, err := bot.VideoService.DownloadVideo(context.Background(), ctx.Message().Text)
+		res, err := bot.MediaService.Extract(context.Background(), ctx.Message().Text)
 		if err != nil {
 			if strings.Contains(err.Error(), "URL") {
 				bot.Logger.Error(err.Error())
@@ -36,31 +37,30 @@ func createHandleLink(bot *b.Bot) telebot.HandlerFunc {
 				bot.Logger.Error(err.Error())
 				bot.MustSend(chatId, bot.Replies.Error)
 			}
-
-			bot.MustDelete(botMsg)
-			bot.SessionStore.RemoveProcessingLink(chatId, processingLinkKey)
-
 			return nil
 		}
 
-		cleanFileName := utils.RemoveSaltFromFileName(utils.RemoveCompressedSuffix(name))
-
 		if forwardChatId, enabled := bot.ForwardModeService.GetForwardChat(chatId); enabled {
-			bot.MustSend(forwardChatId,
-				video(path, cleanFileName,
-					fmt.Sprintf(bot.Replies.ValueFromName, cleanFileName, userFirstName)))
+			sendMedia(bot, forwardChatId, res, fmt.Sprintf(bot.Replies.ValueFromName, utils.RemoveCompressedSuffix(res.Files[0].Name), userFirstName))
 		} else {
-			bot.MustSend(chatId, video(path, cleanFileName, cleanFileName))
+			sendMedia(bot, chatId, res, utils.RemoveCompressedSuffix(res.Files[0].Name))
 		}
 
 		bot.MustReact(userMsg, react.ThumbUp)
 		bot.MustDelete(botMsg)
 
-		err = bot.VideoService.DeleteVideoByName(name)
-
 		bot.SessionStore.RemoveProcessingLink(chatId, processingLinkKey)
 
 		return nil
+	}
+}
+
+func sendMedia(bot *b.Bot, chatId int64, media *model.MediaResult, caption string) {
+	switch media.Type {
+	case model.MediaAlbum:
+		bot.MustSendAlbum(chatId, album(media, caption))
+	case model.MediaVideo:
+		bot.MustSend(chatId, video(media.Files[0].Path, media.Files[0].Name, caption))
 	}
 }
 
@@ -70,4 +70,15 @@ func video(path string, name string, caption string) *telebot.Video {
 		FileName: name, CaptionAbove: true,
 		Caption: caption,
 	}
+}
+
+func album(media *model.MediaResult, caption string) telebot.Album {
+	album := make(telebot.Album, len(media.Files))
+	for i, f := range media.Files {
+		album[i] = &telebot.Photo{
+			File: telebot.FromDisk(f.Path),
+		}
+	}
+	album.SetCaption(caption)
+	return album
 }
