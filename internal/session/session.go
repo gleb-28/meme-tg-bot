@@ -10,7 +10,7 @@ import (
 
 type Session struct {
 	ProcessingLinks      map[string]*ProcessingLink
-	MediaBatch           *MediaBatch
+	MediaBatches         map[string]*MediaBatch
 	ForwardModeLoaded    bool
 	ForwardModeIsEnabled bool
 	ForwardChatId        int64
@@ -21,8 +21,13 @@ type ProcessingLink struct {
 	BotMsg  *telebot.Message // bot reply with "downloading" state
 }
 
+type MediaItem struct {
+	MessageID int
+	Input     telebot.Inputtable
+}
+
 type MediaBatch struct {
-	Items   []telebot.Inputtable
+	Items   []MediaItem
 	Caption string
 	Timer   *time.Timer
 }
@@ -54,6 +59,7 @@ func (store *Store) Get(chatID int64) *Session {
 
 	session = &Session{
 		ProcessingLinks: make(map[string]*ProcessingLink),
+		MediaBatches:    make(map[string]*MediaBatch),
 	}
 	store.sessions[chatID] = session
 	return session
@@ -131,23 +137,34 @@ func (store *Store) SetForwardMode(chatID int64, isEnabled bool, forwardChatID i
 	session.ForwardModeLoaded = true
 }
 
-func (store *Store) GetMediaBatch(chatID int64) (*MediaBatch, bool) {
+// --- Media batches (albums) ---
+
+// GetOrCreateMediaBatch returns existing batch for albumID or creates it atomically.
+// If created, init is called before releasing the lock so the batch is fully
+// initialized before use by other goroutines.
+func (store *Store) GetOrCreateMediaBatch(chatID int64, albumID string, init func(*MediaBatch)) (*MediaBatch, bool) {
 	session := store.Get(chatID)
 	store.mu.Lock()
 	defer store.mu.Unlock()
-	return session.MediaBatch, session.MediaBatch != nil
+	batch, ok := session.MediaBatches[albumID]
+	if !ok {
+		batch = &MediaBatch{}
+		if init != nil {
+			init(batch)
+		}
+		session.MediaBatches[albumID] = batch
+	}
+	return batch, ok
 }
 
-func (store *Store) SetMediaBatch(chatID int64, batch *MediaBatch) {
+// DeleteMediaBatch removes and returns whether it existed.
+func (store *Store) DeleteMediaBatch(chatID int64, albumID string) bool {
 	session := store.Get(chatID)
 	store.mu.Lock()
 	defer store.mu.Unlock()
-	session.MediaBatch = batch
-}
-
-func (store *Store) DeleteMediaBatch(chatID int64) {
-	session := store.Get(chatID)
-	store.mu.Lock()
-	defer store.mu.Unlock()
-	session.MediaBatch = nil
+	if _, ok := session.MediaBatches[albumID]; ok {
+		delete(session.MediaBatches, albumID)
+		return true
+	}
+	return false
 }

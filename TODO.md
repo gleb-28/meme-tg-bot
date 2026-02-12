@@ -17,8 +17,6 @@
 - [ ] **Add timeouts and cancellation for long-running operations**
 - [ ] **Prevent forward-mode loops and self-triggering**
   _Notes_: Ignore messages coming from the forward chat itself, Ignore messages sent by the bot
-- [ ] **Fix albums getting mixed when forwarding media batches**
-  _Notes_: Ensure album items preserve order and stay grouped in forward mode
 
 ### P2 — soon
 
@@ -28,8 +26,6 @@
 
 ### P3 — nice-to-have
 
-- [ ] **Expand README with “forward mode” how-to**
-  _Notes_: Describe `/change_mode`, required admin permissions, and that albums/media batches are forwarded
 - [ ] **Add CI to run tests and formatting + pre-commit**
   _Notes_: Run `go test ./...` and `gofmt` on pushes/PRs (GitHub Actions)
 
@@ -38,3 +34,7 @@
 
 - [x] **Add bot.MustEdit method**
 - [x] **Handle yt-dlp can't process Instagram images**
+- [x] **Fix albums getting mixed when forwarding media batches**
+  _Notes_: Ensure album items preserve order and stay grouped in forward mode
+- [x] **Expand README with “forward mode” how-to**
+  _Notes_: Describe `/change_mode`, required admin permissions, and that albums/media batches are forwarded

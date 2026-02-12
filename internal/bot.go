@@ -13,6 +13,7 @@ import (
 	"memetgbot/internal/session"
 	"memetgbot/internal/text"
 	"memetgbot/model"
+	"sort"
 	"sync"
 	"time"
 
@@ -175,23 +176,25 @@ func (bot *Bot) ForwardAnyMessage(ctx telebot.Context, forwardChatId int64) {
 func (bot *Bot) handleAlbumGroup(ctx telebot.Context, forwardChatId int64) {
 	msg := ctx.Message()
 	userID := ctx.Chat().ID
+	albumID := msg.AlbumID
 
-	batch, exists := bot.SessionStore.GetMediaBatch(userID)
 	albumTimeout := 600 * time.Millisecond
 
-	if !exists {
-		batch = &session.MediaBatch{}
-
+	batch, exists := bot.SessionStore.GetOrCreateMediaBatch(userID, albumID, func(batch *session.MediaBatch) {
 		batch.Timer = time.AfterFunc(albumTimeout, func() {
-			bot.SessionStore.DeleteMediaBatch(userID)
+			bot.SessionStore.DeleteMediaBatch(userID, albumID)
 
 			if len(batch.Items) == 0 {
 				return
 			}
 
+			sort.Slice(batch.Items, func(i, j int) bool {
+				return batch.Items[i].MessageID < batch.Items[j].MessageID
+			})
+
 			album := make(telebot.Album, len(batch.Items))
 			for i, item := range batch.Items {
-				album[i] = item
+				album[i] = item.Input
 			}
 
 			if batch.Caption != "" {
@@ -205,8 +208,10 @@ func (bot *Bot) handleAlbumGroup(ctx telebot.Context, forwardChatId int64) {
 			bot.MustSendAlbum(forwardChatId, album)
 			bot.MustReact(msg, react.ThumbUp)
 		})
+	})
 
-		bot.SessionStore.SetMediaBatch(userID, batch)
+	if !exists {
+		// Timer already started in initializer
 	} else {
 		batch.Timer.Reset(albumTimeout)
 	}
@@ -240,7 +245,10 @@ func (bot *Bot) handleAlbumGroup(ctx telebot.Context, forwardChatId int64) {
 	}
 
 	if item != nil {
-		batch.Items = append(batch.Items, item)
+		batch.Items = append(batch.Items, session.MediaItem{
+			MessageID: msg.ID,
+			Input:     item,
+		})
 	}
 
 	// ===== CAPTION ONCE =====

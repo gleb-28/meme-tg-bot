@@ -19,10 +19,30 @@ The bot supports:
 - 📥 Downloading videos from popular platforms (YouTube, TikTok, Instagram, Twitter/X, etc.)
 - 📸 Downloading Instagram photos/albums via `gallery-dl` whenever a video stream isn't available
 - 📥 Forward mode to chosen chat
-- Forwarding audio, video, docs, pics, stickers, voices, GIFs, albums in forward mode
+- Forwarding audio, video, docs, pics, stickers, voices, GIFs, albums in forward mode (albums keep the original order)
 - 💾 SQLite database for storing bot data
 - ⚡ Fast processing with in-memory caching
--   🛠 Easy setup with Makefile and environment variables
+- 🛠 Easy setup with Makefile and environment variables
+
+## 🔀 Forward mode
+
+Let the bot forward everything you send it to a single destination chat (group/channel).
+
+### Enable or change the target chat
+1. Send `/change_mode` to the bot (after activation).
+2. Tap **Включить режим пересылки**. If a previous chat exists, choose whether to reuse it or pick a new one.
+3. If picking a new chat, forward any message from the destination group/channel. The bot validates that message comes from a group and that the bot is an **admin** there; otherwise it will ask you to promote it first.
+4. On success the bot replies that forwarding is enabled and saves the chat for next time.
+
+### Disable forwarding
+1. Send `/change_mode`.
+2. Tap **Выключить режим пересылки**.
+
+### How forwarding behaves
+- Non-link messages are forwarded; link messages are still downloaded normally.
+- Text is prefixed with “<name> говорит: …”; media (photos/videos/docs/audio/voice/stickers/GIFs) with “<name> присылает”.
+- Albums are buffered briefly (~600 ms) so items stay in order; a single caption is applied. Captions over 1024 characters are sent as a separate text message.
+- Avoid pointing the destination chat back to the same conversation where you run the bot to prevent loops.
 
 
 ## 📦 Requirements
