@@ -9,6 +9,7 @@ import (
 	"memetgbot/pkg/utils"
 	"strconv"
 	"strings"
+	"time"
 
 	"gopkg.in/telebot.v4"
 	"gopkg.in/telebot.v4/react"
@@ -28,7 +29,10 @@ func createHandleLink(bot *b.Bot) telebot.HandlerFunc {
 			BotMsg:  botMsg,
 		})
 
-		res, err := bot.MediaService.Extract(context.Background(), ctx.Message().Text)
+		reqCtx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+		defer cancel()
+
+		res, err := bot.MediaService.Extract(reqCtx, ctx.Message().Text)
 		if err != nil {
 			if strings.Contains(err.Error(), "URL") {
 				bot.Logger.Error(err.Error())

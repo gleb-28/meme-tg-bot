@@ -14,7 +14,6 @@
 
 ### P1 — critical
 
-- [ ] **Add timeouts and cancellation for long-running operations**
 - [ ] **Prevent forward-mode loops and self-triggering**
   _Notes_: Ignore messages coming from the forward chat itself, Ignore messages sent by the bot
 
@@ -38,3 +37,4 @@
   _Notes_: Ensure album items preserve order and stay grouped in forward mode
 - [x] **Expand README with “forward mode” how-to**
   _Notes_: Describe `/change_mode`, required admin permissions, and that albums/media batches are forwarded
+- [x] **Add timeouts and cancellation for long-running operations**

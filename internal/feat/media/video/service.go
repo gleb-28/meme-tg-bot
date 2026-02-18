@@ -81,7 +81,7 @@ func (videoService *Extractor) Extract(ctx context.Context, videoURL string) (*m
 
 	fileName := filepath.Base(downloadedPath)
 
-	compressedPath, err := videoService.compressVideo(downloadedPath)
+	compressedPath, err := videoService.compressVideo(ctx, downloadedPath)
 	if err != nil {
 		videoService.logger.Error(err.Error())
 		utils.RemoveAsync(downloadedPath, time.Minute)
@@ -104,11 +104,15 @@ func (videoService *Extractor) Extract(ctx context.Context, videoURL string) (*m
 	}, nil
 }
 
-func (videoService *Extractor) compressVideo(inputPath string) (string, error) {
+func (videoService *Extractor) compressVideo(ctx context.Context, inputPath string) (string, error) {
 	outputPath := strings.TrimSuffix(inputPath, filepath.Ext(inputPath)) + "_compressed.mp4"
 	videoService.logger.Debug(fmt.Sprintf("Compressing video: %s", inputPath))
 
-	cmd := exec.Command(
+	cctx, cancel := context.WithTimeout(ctx, 90*time.Second)
+	defer cancel()
+
+	cmd := exec.CommandContext(
+		cctx,
 		videoService.ffmpegPath,
 		"-i", inputPath,
 		"-c:v", "libx264",
