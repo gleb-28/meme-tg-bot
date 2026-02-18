@@ -61,11 +61,13 @@ func (s *Service) ensureForwardModeLoaded(userID int64) {
 		return
 	}
 
-	fm, err := s.forwardModeRepo.Get(userID)
-	if err == nil {
+	fm, ok, err := s.forwardModeRepo.TryGet(userID)
+	if err == nil && ok {
 		s.session.SetForwardMode(userID, fm.IsEnabled, fm.ChatID)
 		return
 	}
 
-	s.logger.Error(fmt.Sprintf("Error while ensureForwardModeLoaded %v: %v", userID, err.Error()))
+	if err != nil {
+		s.logger.Error(fmt.Sprintf("Error while ensureForwardModeLoaded %v: %v", userID, err.Error()))
+	}
 }

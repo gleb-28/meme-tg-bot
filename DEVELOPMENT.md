@@ -21,6 +21,11 @@
 - Forward mode: `internal/feat/forward` with per-user session cache in `internal/session`
 - Data: models in `model/chat.go`, repos in `internal/repo`, SQLite setup in `internal/db`
 
+### Repositories
+- Repos expose `TryGet(id) (*T, found bool, err)`; `found=false` means “not in DB” and is **not** an error.
+- Callers should prefer `TryGet` and branch on the `found` flag; missing rows should not be treated as errors.
+- `Get` helpers were removed; keep new repos consistent with the `TryGet` pattern.
+
 ## Run locally
 - `make run` (or `go run cmd/bot/main.go`).
 

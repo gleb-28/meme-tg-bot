@@ -272,14 +272,18 @@ func (bot *Bot) GetChatCached(chatId int64) (*model.Chat, error) {
 		return chat, nil
 	}
 
-	chatDB, err := bot.chatRepo.Get(chatId)
+	chatDB, ok, err := bot.chatRepo.TryGet(chatId)
 	if err != nil {
 		return nil, err
 	}
 
-	bot.setChatCache(chatId, &chatDB)
+	if !ok {
+		return &model.Chat{}, nil
+	}
 
-	return &chatDB, nil
+	bot.setChatCache(chatId, chatDB)
+
+	return chatDB, nil
 }
 
 func (bot *Bot) SaveChat(chat *model.Chat) error {

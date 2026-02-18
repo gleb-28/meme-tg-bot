@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"errors"
 	"memetgbot/model"
 
 	"gorm.io/gorm"
@@ -12,6 +13,21 @@ type ForwardMode struct {
 
 func NewForwardModeRepo(db *gorm.DB) *ForwardMode {
 	return &ForwardMode{db: db}
+}
+
+func (r *ForwardMode) TryGet(userID int64) (*model.ForwardMode, bool, error) {
+	var result model.ForwardMode
+
+	err := r.db.Where("user_id = ?", userID).First(&result).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, false, nil
+	}
+	if err != nil {
+		return nil, false, err
+	}
+
+	return &result, true, nil
 }
 
 func (r *ForwardMode) Enable(userID int64, chatId int64) error {
@@ -35,18 +51,13 @@ func (r *ForwardMode) Disable(userID int64) error {
 		Error
 }
 
-func (r *ForwardMode) Get(userID int64) (model.ForwardMode, error) {
-	var result model.ForwardMode
-
-	resp := r.db.Find(&model.ForwardMode{}, &model.ForwardMode{UserID: userID}).Scan(&result)
-
-	return result, resp.Error
-}
-
 func (r *ForwardMode) IsEnabled(userID int64) (bool, error) {
-	fm, err := r.Get(userID)
-	if err == nil {
-		return fm.IsEnabled, nil
+	fm, found, err := r.TryGet(userID)
+	if err != nil {
+		return false, err
 	}
-	return false, err
+	if !found {
+		return false, nil
+	}
+	return fm.IsEnabled, nil
 }
