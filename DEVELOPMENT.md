@@ -44,3 +44,4 @@
 - Forward mode requires the bot to be an admin in the target group.
 - Set `IS_DEBUG=true` for verbose logs.
 - Prefer `bot.MustEdit(msg, ...)` when you need to edit a message without handling errors manually; it logs failures automatically.
+- Non-authenticated session cache entries expire after 10 minutes (`constants.NonAuthSessionTTL`) via the background cleanup worker; adjust the constant if you need a different window.

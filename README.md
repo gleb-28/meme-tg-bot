@@ -23,6 +23,7 @@ The bot supports:
 - 💾 SQLite database for storing bot data
 - ⚡ Fast processing with in-memory caching
 - 🛠 Easy setup with Makefile and environment variables
+- 🧹 Non-authenticated sessions auto-expire after 10 minutes to keep memory clean (tune `NonAuthSessionTTL` in `internal/core/constants`).
 
 ## 🔀 Forward mode
 

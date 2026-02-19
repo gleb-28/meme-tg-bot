@@ -1,6 +1,7 @@
 package session
 
 import (
+	"context"
 	"memetgbot/internal/core/logger"
 	"sync"
 	"time"
@@ -13,7 +14,9 @@ type Session struct {
 	MediaBatches         map[string]*MediaBatch
 	ForwardModeLoaded    bool
 	ForwardModeIsEnabled bool
-	ForwardChatId        int64
+	ForwardChatID        int64
+	Authorized           bool
+	ExpiresAt            time.Time
 }
 
 type ProcessingLink struct {
@@ -35,33 +38,33 @@ type MediaBatch struct {
 type Store struct {
 	mu       sync.RWMutex
 	sessions map[int64]*Session
+	ttl      time.Duration
 	logger   logger.AppLogger
 }
 
-func NewStore(logger logger.AppLogger) *Store {
+func NewStore(ttl time.Duration, logger logger.AppLogger) *Store {
 	return &Store{
 		sessions: make(map[int64]*Session),
+		ttl:      ttl,
 		logger:   logger,
 	}
 }
 
 func (store *Store) Get(chatID int64) *Session {
-	store.mu.RLock()
-	session, ok := store.sessions[chatID]
-	store.mu.RUnlock()
-
-	if ok {
-		return session
-	}
-
 	store.mu.Lock()
 	defer store.mu.Unlock()
 
-	session = &Session{
-		ProcessingLinks: make(map[string]*ProcessingLink),
-		MediaBatches:    make(map[string]*MediaBatch),
+	session, ok := store.sessions[chatID]
+	if !ok {
+		session = &Session{
+			ProcessingLinks: make(map[string]*ProcessingLink),
+			MediaBatches:    make(map[string]*MediaBatch),
+		}
+		store.sessions[chatID] = session
 	}
-	store.sessions[chatID] = session
+
+	store.ensureExpiryLocked(session)
+
 	return session
 }
 
@@ -111,7 +114,7 @@ func (store *Store) EnableForwardMode(chatID int64, forwardChatID int64) {
 	store.mu.Lock()
 	defer store.mu.Unlock()
 	session.ForwardModeIsEnabled = true
-	session.ForwardChatId = forwardChatID
+	session.ForwardChatID = forwardChatID
 }
 
 func (store *Store) DisableForwardMode(chatID int64) {
@@ -125,7 +128,7 @@ func (store *Store) GetForwardMode(chatID int64) (isEnabled bool, forwardChatID 
 	session := store.Get(chatID)
 	store.mu.RLock()
 	defer store.mu.RUnlock()
-	return session.ForwardModeIsEnabled, session.ForwardChatId
+	return session.ForwardModeIsEnabled, session.ForwardChatID
 }
 
 func (store *Store) SetForwardMode(chatID int64, isEnabled bool, forwardChatID int64) {
@@ -133,7 +136,7 @@ func (store *Store) SetForwardMode(chatID int64, isEnabled bool, forwardChatID i
 	store.mu.Lock()
 	defer store.mu.Unlock()
 	session.ForwardModeIsEnabled = isEnabled
-	session.ForwardChatId = forwardChatID
+	session.ForwardChatID = forwardChatID
 	session.ForwardModeLoaded = true
 }
 
@@ -167,4 +170,84 @@ func (store *Store) DeleteMediaBatch(chatID int64, albumID string) bool {
 		return true
 	}
 	return false
+}
+
+// Delete removes session and stops timers to avoid leaks.
+func (store *Store) Delete(chatID int64) {
+	store.mu.Lock()
+	defer store.mu.Unlock()
+
+	store.deleteLocked(chatID)
+}
+
+// MarkAuthorized stops expiration for an authenticated chat.
+func (store *Store) MarkAuthorized(chatID int64) {
+	store.mu.Lock()
+	defer store.mu.Unlock()
+
+	session, ok := store.sessions[chatID]
+	if !ok {
+		return
+	}
+
+	session.Authorized = true
+	session.ExpiresAt = time.Time{}
+}
+
+func (store *Store) ensureExpiryLocked(session *Session) {
+	if session.Authorized || store.ttl <= 0 {
+		session.ExpiresAt = time.Time{}
+		return
+	}
+
+	session.ExpiresAt = time.Now().Add(store.ttl)
+}
+
+func (store *Store) StartCleanupWorker(ctx context.Context, interval time.Duration) {
+	ticker := time.NewTicker(interval)
+
+	go func() {
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-ticker.C:
+				store.cleanupExpired()
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+}
+
+func (store *Store) cleanupExpired() {
+	now := time.Now()
+
+	store.mu.Lock()
+	defer store.mu.Unlock()
+
+	for chatID, session := range store.sessions {
+		if session.Authorized {
+			continue
+		}
+
+		if !session.ExpiresAt.IsZero() && now.After(session.ExpiresAt) {
+			store.deleteLocked(chatID)
+		}
+	}
+}
+
+func (store *Store) deleteLocked(chatID int64) {
+	session, ok := store.sessions[chatID]
+	if !ok {
+		return
+	}
+
+	for _, batch := range session.MediaBatches {
+		if batch.Timer != nil {
+			batch.Timer.Stop()
+		}
+	}
+
+	delete(store.sessions, chatID)
 }

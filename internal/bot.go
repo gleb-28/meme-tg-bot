@@ -292,6 +292,7 @@ func (bot *Bot) SaveChat(chat *model.Chat) error {
 	}
 
 	bot.setChatCache(chat.TelegramID, chat)
+	bot.SessionStore.MarkAuthorized(chat.TelegramID)
 
 	return nil
 }

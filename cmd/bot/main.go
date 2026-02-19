@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	b "memetgbot/internal"
 	cfg "memetgbot/internal/core/config"
 	"memetgbot/internal/core/constants"
@@ -26,7 +27,8 @@ func main() {
 	db := d.MustDB(config, logger)
 
 	fsm := fsmManager.New(logger)
-	sessionStore := session.NewStore(logger)
+	sessionStore := session.NewStore(constants.NonAuthSessionTTL, logger)
+	sessionStore.StartCleanupWorker(context.Background(), constants.NonAuthSessionTTL/2)
 
 	chatRepo := repo.NewChatRepo(db)
 	forwardModeRepo := repo.NewForwardModeRepo(db)

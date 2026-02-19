@@ -19,7 +19,6 @@
 
 ### P2 — soon
 
-- [ ] **Clear session cache for non-auth users**
 - [ ] **Improve yt-dlp error handling and user feedback**
 - [ ] **Add rate limiting and abuse protection**
 
@@ -38,3 +37,4 @@
 - [x] **Expand README with “forward mode” how-to**
   _Notes_: Describe `/change_mode`, required admin permissions, and that albums/media batches are forwarded
 - [x] **Add timeouts and cancellation for long-running operations**
+- [x] **Clear session cache for non-auth users**
