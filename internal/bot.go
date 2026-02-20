@@ -131,6 +131,18 @@ func (bot *Bot) ForwardAnyMessage(ctx telebot.Context, forwardChatId int64) {
 		return
 	}
 
+	// ===== VIDEO NOTE =====
+	if msg.VideoNote != nil {
+		videoNote := &telebot.VideoNote{
+			File: msg.VideoNote.File,
+		}
+
+		bot.MustSend(forwardChatId, fmt.Sprintf("%s:", sendsPrefix))
+		bot.MustSend(forwardChatId, videoNote)
+		bot.MustReact(msg, react.ThumbUp)
+		return
+	}
+
 	// ===== AUDIO =====
 	if msg.Audio != nil {
 		audio := &telebot.Audio{

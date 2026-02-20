@@ -14,6 +14,7 @@ func MustInitMessagesHandler(bot *b.Bot) {
 	bot.Handle(telebot.OnDocument, createMessageHandler(bot))
 	bot.Handle(telebot.OnPhoto, createMessageHandler(bot))
 	bot.Handle(telebot.OnVideo, createMessageHandler(bot))
+	bot.Handle(telebot.OnVideoNote, createMessageHandler(bot))
 	bot.Handle(telebot.OnAnimation, createMessageHandler(bot))
 	bot.Handle(telebot.OnSticker, createMessageHandler(bot))
 	bot.Handle(telebot.OnVoice, createMessageHandler(bot))
