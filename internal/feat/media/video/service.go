@@ -116,8 +116,9 @@ func (videoService *Extractor) compressVideo(ctx context.Context, inputPath stri
 		videoService.ffmpegPath,
 		"-i", inputPath,
 		"-c:v", "libx264",
-		"-preset", "fast",
-		"-crf", "25",
+		// medium preset + lower CRF to keep more detail while still shrinking size
+		"-preset", "medium",
+		"-crf", "21",
 		"-c:a", "aac",
 		"-y",
 		outputPath,
