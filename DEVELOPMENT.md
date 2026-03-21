@@ -8,6 +8,9 @@
 - sqlite3
 - Telegram bot token and admin user ID
 
+### Cookies / Instagram
+- `COOKIES_PATH` must point to an existing, fresh cookies.txt; the Instagram image path now fails fast if the file is missing and surfaces the underlying `gallery-dl` error text in chat. If you see `gallery-dl failed` in responses, refresh cookies and verify the path inside the container/host.
+
 ## Setup
 1. Copy `.env.example` to `.env` and fill in the values.
 2. Ensure `COOKIES_PATH` points to a real cookies file (for example `./data/cookies.txt`).

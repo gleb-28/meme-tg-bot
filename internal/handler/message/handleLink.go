@@ -39,7 +39,7 @@ func createHandleLink(bot *b.Bot) telebot.HandlerFunc {
 				bot.MustSend(chatId, bot.Replies.IsNotValidURLError)
 			} else {
 				bot.Logger.Error(err.Error())
-				bot.MustSend(chatId, bot.Replies.Error)
+				bot.MustSend(chatId, fmt.Sprintf("%s\n%s", bot.Replies.Error, err.Error()))
 			}
 			return nil
 		}

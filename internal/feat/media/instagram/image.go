@@ -3,9 +3,11 @@ package instagram
 import (
 	"context"
 	"errors"
+	"fmt"
 	"memetgbot/internal/core/logger"
 	"memetgbot/model"
 	"memetgbot/pkg/utils"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"time"
@@ -26,6 +28,10 @@ func (e *ImageExtractor) Extract(
 	url string,
 ) (*model.MediaResult, error) {
 
+	if _, err := os.Stat(e.cookiesPath); err != nil {
+		return nil, fmt.Errorf("instagram cookies file missing at %s: %w", e.cookiesPath, err)
+	}
+
 	ws, err := utils.NewTempWorkspace(e.downloadDir, "insta_")
 	if err != nil {
 		return nil, err
@@ -41,8 +47,8 @@ func (e *ImageExtractor) Extract(
 		url,
 	)
 
-	if err := cmd.Run(); err != nil {
-		return nil, err
+	if out, err := cmd.CombinedOutput(); err != nil {
+		return nil, fmt.Errorf("gallery-dl failed: %w; output: %s", err, string(out))
 	}
 
 	e.logger.Debug("gallery-dl instagram image download")
