@@ -82,6 +82,12 @@ DB_FILE_NAME=./data/bot.db # REQUIRED - SQLite db file (*.db)
 COOKIES_PATH=./data/cookies.txt # REQUIRED - path to cookies file
 YTDLP_PATH=/usr/bin/yt-dlp # REQUIRED - yt-dlp binary path
 FFMPEG_PATH=/usr/bin/ffmpeg # REQUIRED - ffmpeg binary path
+GALLERYDL_PATH=/usr/bin/gallery-dl # OPTIONAL - gallery-dl binary path (default: gallery-dl from PATH)
+INSTAGRAM_GDL_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 # OPTIONAL
+INSTAGRAM_GDL_SLEEP=7.0-12.0 # OPTIONAL - delay before each file download
+INSTAGRAM_GDL_SLEEP_REQUEST=25.0-50.0 # OPTIONAL - delay between Instagram HTTP requests
+INSTAGRAM_GDL_SLEEP_EXTRACTOR=4.0-8.0 # OPTIONAL - delay before starting extraction
+INSTAGRAM_GDL_SLEEP_429=900.0 # OPTIONAL - cooldown after HTTP 429
 IS_DEBUG=false             # OPTIONAL - print logs for debugging
 ```
 ## 📁 Project commands
@@ -122,6 +128,8 @@ COOKIES_PATH=./data/cookies.txt
 
 Both `yt-dlp` and the new `gallery-dl` Instagram image extractor consume the same cookies file, so keep `COOKIES_PATH` pointed at the export you generated.
 
+If Instagram starts showing `We added a restriction to your account`, treat that as an account-level rate-limit. This bot now runs Instagram image downloads one-at-a-time and applies conservative `gallery-dl` sleep settings by default, but you still need to stop requests for a while and refresh cookies from a normal browser session before resuming.
+
 ## 🚀 VPS Deployment
 
 This guide shows how to deploy the bot on a fresh Ubuntu VPS using Docker.
@@ -133,6 +141,7 @@ DB_FILE_NAME=/app/data/bot.db
 COOKIES_PATH=/app/cookies.txt
 YTDLP_PATH=/usr/local/bin/yt-dlp
 FFMPEG_PATH=/usr/bin/ffmpeg
+GALLERYDL_PATH=/usr/bin/gallery-dl
 ```
 
 2. Create `deploy/prod.env` (if you need to override the defaults above) and `deploy/deploy.env`, then run the deploy helper from the repo root:

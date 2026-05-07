@@ -10,13 +10,15 @@
 
 ### Cookies / Instagram
 - `COOKIES_PATH` must point to an existing, fresh cookies.txt; the Instagram image path now fails fast if the file is missing and surfaces the underlying `gallery-dl` error text in chat. If you see `gallery-dl failed` in responses, refresh cookies and verify the path inside the container/host.
+- The bot now serializes `gallery-dl` Instagram downloads and applies conservative defaults for `INSTAGRAM_GDL_SLEEP`, `INSTAGRAM_GDL_SLEEP_REQUEST`, `INSTAGRAM_GDL_SLEEP_EXTRACTOR`, and `INSTAGRAM_GDL_SLEEP_429`. If the account is already restricted, pause usage and refresh cookies after the restriction clears.
 
 ## Setup
 1. Copy `.env.example` to `.env` and fill in the values.
 2. Ensure `COOKIES_PATH` points to a real cookies file (for example `./data/cookies.txt`).
    The Instagram image extractor also consumes this file via `gallery-dl`, so keep it accessible at the same path.
-3. Ensure `DB_FILE_NAME` points to a writable path (for example `./data/bot.db`).
-4. If you run the bot in Docker, set `IS_DOCKERIZED=true` and provide environment variables via the compose/env files.
+3. If you need to tune Instagram pacing, use the optional `INSTAGRAM_GDL_*` env vars from `.env.example` instead of editing code.
+4. Ensure `DB_FILE_NAME` points to a writable path (for example `./data/bot.db`).
+5. If you run the bot in Docker, set `IS_DOCKERIZED=true` and provide environment variables via the compose/env files.
 
 ## Project layout (quick map)
 - Bot wiring: `cmd/bot/main.go`

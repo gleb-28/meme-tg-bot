@@ -34,7 +34,15 @@ func main() {
 	forwardModeRepo := repo.NewForwardModeRepo(db)
 
 	videoService := video.MustNewVideoService(constants.VideoDownloadDirPath, config.YtdlpPath, config.CookiesPath, config.FfmpegPath, logger)
-	instaService := instagram.NewService(videoService, instagram.NewImageService(constants.VideoDownloadDirPath, config.CookiesPath, logger))
+	instaImageService := instagram.NewImageService(constants.VideoDownloadDirPath, config.CookiesPath, instagram.ImageConfig{
+		GalleryDLPath:  config.GalleryDLPath,
+		UserAgent:      config.Instagram.GalleryDLUserAgent,
+		Sleep:          config.Instagram.GalleryDLSleep,
+		SleepRequest:   config.Instagram.GalleryDLSleepRequest,
+		SleepExtractor: config.Instagram.GalleryDLSleepExtractor,
+		Sleep429:       config.Instagram.GalleryDLSleep429,
+	}, logger)
+	instaService := instagram.NewService(videoService, instaImageService)
 	mediaService := media.NewService(instaService, videoService)
 	forwardModeService := forward.NewForwardModeService(forwardModeRepo, sessionStore, logger)
 
